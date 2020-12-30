@@ -1,6 +1,5 @@
 """The dobiss integration."""
 import logging
-
 from asyncio import gather
 
 import voluptuous as vol
