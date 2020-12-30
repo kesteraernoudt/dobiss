@@ -9,15 +9,17 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-**This component will set up the following platforms.**
+**This component will set up the following platforms coming from a [dobiss] NXT server.**
 
-| Platform        | Description                         |
-| --------------- | ----------------------------------- |
-| `binary_sensor` | Show something `True` or `False`.   |
-| `sensor`        | Show info from API.                 |
-| `switch`        | Switch something `True` or `False`. |
+| Platform        | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| `binary_sensor` | Dobiss contacts - can be open or closed.                         |
+| `sensor`        | Dobiss sensors: temperature and light sensors.                   |
+| `switch`        | Dobiss switches - can be relais outputs, flags, scenario's, etc. |
+| `light`         | Dobiss lights - dimmable or not.                                 |
+| `climate`       | Dobiss climate control - if you have temperature zone's.         |
+| `cover`         | Dobiss covers - screens etc.                                     |
 
-![example][exampleimg]
 
 {% if not installed %}
 
@@ -30,6 +32,9 @@
 
 ## Configuration is done in the UI
 
+## Dependencies
+
+This integration will use the [pydobiss] python library which uses the native [Dobiss NXT API][dobiss_api].
 <!---->
 
 ## Credits
@@ -49,7 +54,6 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 [discord]: https://discord.gg/Qa5fW2R
 [discord-shield]: https://img.shields.io/discord/330944238910963714.svg?style=for-the-badge
-[exampleimg]: example.png
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
 [forum]: https://community.home-assistant.io/
 [license]: https://github.com/kesteraernoudt/dobiss/blob/main/LICENSE
@@ -58,3 +62,6 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [releases-shield]: https://img.shields.io/github/release/kesteraernoudt/dobiss.svg?style=for-the-badge
 [releases]: https://github.com/kesteraernoudt/dobiss/releases
 [user_profile]: https://github.com/kesteraernoudt
+[dobiss]: https://www.dobiss.com/en
+[pydobiss]: https://pypi.org/project/pydobiss/
+[dobiss_api]: http://support.dobiss.com/books/nl-dobiss-nxt/page/developer-api
