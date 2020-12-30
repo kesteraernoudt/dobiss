@@ -1,0 +1,7 @@
+{
+  "name": "dobiss",
+  "hacs": "1.6.0",
+  "domains": ["binary_sensor", "sensor", "switch", "light", "climate", "cover"],
+  "iot_class": ["Local Push", "Cloud Push"],
+  "homeassistant": "0.118.0"
+}

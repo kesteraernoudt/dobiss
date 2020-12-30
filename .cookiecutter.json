@@ -1,0 +1,13 @@
+{
+  "_copy_without_render": [
+    ".github/workflows/*.yml",
+    ".github/workflows/*.yaml"
+  ],
+  "_template": "gh:oncleben31/cookiecutter-homeassistant-custom-component",
+  "class_name_prefix": "Dobiss",
+  "domain_name": "dobiss",
+  "friendly_name": "dobiss",
+  "github_user": "kesteraernoudt",
+  "project_name": "dobiss",
+  "version": "0.0.0"
+}
