@@ -1,10 +1,6 @@
 """Support for dobiss climate control."""
-from datetime import timedelta
-
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_ILLUMINANCE,
     TEMP_CELSIUS,
     ATTR_TEMPERATURE,
 )
@@ -12,14 +8,9 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.components.climate.const import (
-    CURRENT_HVAC_COOL,
-    CURRENT_HVAC_DRY,
-    CURRENT_HVAC_FAN,
     CURRENT_HVAC_HEAT,
     CURRENT_HVAC_IDLE,
-    CURRENT_HVAC_OFF,
     HVAC_MODE_AUTO,
-    HVAC_MODE_OFF,
 )
 from homeassistant.components.climate import (
     ClimateEntity,
@@ -37,9 +28,7 @@ from .const import DOMAIN, KEY_API
 import logging
 
 from dobissapi import (
-    DobissAPI,
     DobissTempSensor,
-    ICON_FROM_DOBISS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,6 +49,7 @@ SET_HVAC_TEMP_TIMER_SCHEMA = vol.Schema(
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up dobisssensor."""
 
+    _LOGGER.debug(f"Setting up climate component of {DOMAIN}")
     dobiss = hass.data[DOMAIN][config_entry.entry_id][KEY_API].api
 
     # only add HVAC objects for temperature sensors when there is at least a schedule entry

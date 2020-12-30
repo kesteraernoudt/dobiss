@@ -1,5 +1,4 @@
 """Support for dobiss switchs."""
-from datetime import timedelta
 
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import (
@@ -7,19 +6,15 @@ from homeassistant.const import (
     DEVICE_CLASS_ILLUMINANCE,
     TEMP_CELSIUS,
 )
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN, KEY_API
 
 import logging
 
 from dobissapi import (
-    DobissAPI,
     DobissSensor,
     DobissTempSensor,
     DobissLightSensor,
-    ICON_FROM_DOBISS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,6 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up dobisssensor."""
 
+    _LOGGER.debug(f"Setting up sensor component of {DOMAIN}")
     dobiss = hass.data[DOMAIN][config_entry.entry_id][KEY_API].api
     # _LOGGER.warn("set up dobiss switch on {}".format(dobiss.url))
 

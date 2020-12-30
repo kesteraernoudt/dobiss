@@ -3,31 +3,24 @@ from datetime import timedelta
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
-    ATTR_HS_COLOR,
-    DOMAIN as SENSOR_DOMAIN,
-    ENTITY_ID_FORMAT,
+    DOMAIN,
     SUPPORT_BRIGHTNESS,
-    SUPPORT_COLOR,
-    SUPPORT_COLOR_TEMP,
     LightEntity,
 )
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.util import color as colorutil
 
 from .const import DOMAIN, KEY_API
 
 import logging
 
-from dobissapi import DobissAPI, DobissLight, DobissAnalogOutput, DobissOutput
+from dobissapi import DobissLight, DobissAnalogOutput, DobissOutput
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up dobisslights."""
+
+    _LOGGER.debug(f"Setting up light component of {DOMAIN}")
 
     dobiss = hass.data[DOMAIN][config_entry.entry_id][KEY_API].api
     # _LOGGER.warn("set up dobiss lights on {}".format(dobiss.url))

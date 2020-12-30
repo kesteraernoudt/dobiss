@@ -1,21 +1,23 @@
 """The dobiss integration."""
 import asyncio
-
-from dobissapi.dobissapi import DobissTempSensor
-from homeassistant.helpers.config_validation import entity_id, time
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, ATTR_TIME
+from homeassistant.const import CONF_HOST
 
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 
-from .const import *  # pylint:disable=unused-import
+from .const import (
+    CONF_INVERT_BINARY_SENSOR,
+    DEFAULT_INVERT_BINARY_SENSOR,
+    DEVICES,
+    DOMAIN,
+    KEY_API,
+)
 
 import logging
 
 from dobissapi import DobissAPI
-import requests
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,17 +1,12 @@
 """Support for dobiss switchs."""
-from datetime import timedelta
 
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.const import CONF_PLATFORM
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN, KEY_API
 
 import logging
 
 from dobissapi import (
-    DobissAPI,
     DobissSwitch,
     ICON_FROM_DOBISS,
 )
@@ -22,6 +17,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up dobissswitch."""
 
+    _LOGGER.debug(f"Setting up switch component of {DOMAIN}")
     dobiss = hass.data[DOMAIN][config_entry.entry_id][KEY_API].api
     # _LOGGER.warn(f"set up dobiss switch on {dobiss.host}")
 

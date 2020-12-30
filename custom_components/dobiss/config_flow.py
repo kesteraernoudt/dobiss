@@ -1,5 +1,6 @@
 """Config flow for dobiss integration."""
 import logging
+from homeassistant.const import CONF_HOST
 
 import voluptuous as vol
 
@@ -7,12 +8,17 @@ from homeassistant import config_entries, core, exceptions
 import homeassistant.helpers.config_validation as cv
 from homeassistant.core import callback
 
-from .const import *  # pylint:disable=unused-import
+from .const import (
+    CONF_INVERT_BINARY_SENSOR,
+    CONF_SECRET,
+    CONF_SECURE,
+    DEFAULT_INVERT_BINARY_SENSOR,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 import dobissapi
-import requests
 
 
 class DobissConnection:

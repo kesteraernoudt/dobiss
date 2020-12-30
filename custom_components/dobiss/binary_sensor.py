@@ -1,7 +1,5 @@
 """Support for dobiss switchs."""
-from datetime import timedelta
 
-from homeassistant.helpers.entity import Entity
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     DEVICE_CLASS_DOOR,
@@ -14,10 +12,7 @@ from .const import CONF_INVERT_BINARY_SENSOR, DOMAIN, KEY_API
 import logging
 
 from dobissapi import (
-    DobissAPI,
-    DobissSensor,
     DobissBinarySensor,
-    ICON_FROM_DOBISS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,6 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up dobiss binary sensor."""
 
+    _LOGGER.debug(f"Setting up binary_sensor component of {DOMAIN}")
     dobiss = hass.data[DOMAIN][config_entry.entry_id][KEY_API].api
     # _LOGGER.warn("set up dobiss switch on {}".format(dobiss.url))
 
