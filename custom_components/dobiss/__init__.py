@@ -1,6 +1,7 @@
 """The dobiss integration."""
-import asyncio
 import logging
+
+from asyncio import gather
 
 import voluptuous as vol
 from dobissapi import DobissAPI
@@ -75,7 +76,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     if hass.data[DOMAIN][entry.entry_id][KEY_API].unsub:
         hass.data[DOMAIN][entry.entry_id][KEY_API].unsub()
     unload_ok = all(
-        await asyncio.gather(
+        await gather(
             *[
                 hass.config_entries.async_forward_entry_unload(entry, component)
                 for component in PLATFORMS
