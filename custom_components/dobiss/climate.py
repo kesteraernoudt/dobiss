@@ -1,35 +1,25 @@
 """Support for dobiss climate control."""
-from homeassistant.helpers.entity import Entity
-from homeassistant.const import (
-    TEMP_CELSIUS,
-    ATTR_TEMPERATURE,
-)
-
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.components.climate.const import (
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    HVAC_MODE_AUTO,
-)
-from homeassistant.components.climate import (
-    ClimateEntity,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    HVAC_MODE_HEAT,
-)
-import voluptuous as vol
-
-from homeassistant.helpers.config_validation import entity_id, time
-from homeassistant.const import ATTR_ENTITY_ID, ATTR_TEMPERATURE, ATTR_TIME
-
-from .const import DOMAIN, KEY_API
-
 import logging
 
+import voluptuous as vol
 from dobissapi import (
     DobissTempSensor,
 )
+from homeassistant.components.climate import ClimateEntity
+from homeassistant.components.climate import HVAC_MODE_HEAT
+from homeassistant.components.climate import SUPPORT_PRESET_MODE
+from homeassistant.components.climate import SUPPORT_TARGET_TEMPERATURE
+from homeassistant.components.climate.const import CURRENT_HVAC_HEAT
+from homeassistant.components.climate.const import CURRENT_HVAC_IDLE
+from homeassistant.components.climate.const import HVAC_MODE_AUTO
+from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import ATTR_TEMPERATURE
+from homeassistant.const import ATTR_TIME
+from homeassistant.const import TEMP_CELSIUS
+from homeassistant.helpers.config_validation import entity_id
+
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,10 +60,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             (dev for dev in entities if dev.entity_id == entity_id),
             None,
         )
-        if entity == None:
+        if entity is None:
             raise ValueError(f"no entity found in {DOMAIN} that matches {entity_id}")
         time = call.data.get(ATTR_TIME, None)
-        if time == None:
+        if time is None:
             if entity._dobisssensor.manual_mode:
                 time = entity._dobisssensor.time
             else:
@@ -181,7 +171,7 @@ class HADobissClimateControl(ClimateEntity):
         """Return hvac operation ie. heat, cool mode.
         Need to be one of HVAC_MODE_*.
         """
-        if self._dobisssensor.time != None and self._dobisssensor.time >= 0:
+        if self._dobisssensor.time is not None and self._dobisssensor.time >= 0:
             return HVAC_MODE_HEAT
         return HVAC_MODE_AUTO
 

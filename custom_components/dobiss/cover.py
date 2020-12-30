@@ -1,24 +1,18 @@
 """Support for dobiss covers."""
-
-from homeassistant.components.cover import (
-    DEVICE_CLASS_SHADE,
-    DEVICE_CLASS_WINDOW,
-    SUPPORT_CLOSE,
-    SUPPORT_OPEN,
-    SUPPORT_STOP,
-    CoverEntity,
-)
-
-from .const import DOMAIN, KEY_API
-
+import logging
 from asyncio import wait
 
-import logging
+from dobissapi import DOBISS_UP
+from dobissapi import DobissSwitch
+from homeassistant.components.cover import CoverEntity
+from homeassistant.components.cover import DEVICE_CLASS_SHADE
+from homeassistant.components.cover import DEVICE_CLASS_WINDOW
+from homeassistant.components.cover import SUPPORT_CLOSE
+from homeassistant.components.cover import SUPPORT_OPEN
+from homeassistant.components.cover import SUPPORT_STOP
 
-from dobissapi import (
-    DobissSwitch,
-    DOBISS_UP,
-)
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,18 +1,15 @@
 """Support for dobiss lights."""
-from datetime import timedelta
-
-from homeassistant.components.light import (
-    ATTR_BRIGHTNESS,
-    DOMAIN,
-    SUPPORT_BRIGHTNESS,
-    LightEntity,
-)
-
-from .const import DOMAIN, KEY_API
-
 import logging
 
-from dobissapi import DobissLight, DobissAnalogOutput, DobissOutput
+from dobissapi import DobissAnalogOutput
+from dobissapi import DobissLight
+from dobissapi import DobissOutput
+from homeassistant.components.light import ATTR_BRIGHTNESS
+from homeassistant.components.light import LightEntity
+from homeassistant.components.light import SUPPORT_BRIGHTNESS
+
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 

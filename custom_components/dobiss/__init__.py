@@ -1,23 +1,19 @@
 """The dobiss integration."""
 import asyncio
-from homeassistant.const import CONF_HOST
-
-import voluptuous as vol
-
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
-
-from .const import (
-    CONF_INVERT_BINARY_SENSOR,
-    DEFAULT_INVERT_BINARY_SENSOR,
-    DEVICES,
-    DOMAIN,
-    KEY_API,
-)
-
 import logging
 
+import voluptuous as vol
 from dobissapi import DobissAPI
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST
+from homeassistant.core import callback
+from homeassistant.core import HomeAssistant
+
+from .const import CONF_INVERT_BINARY_SENSOR
+from .const import DEFAULT_INVERT_BINARY_SENSOR
+from .const import DEVICES
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -130,7 +126,7 @@ class HADobiss:
             self.available = True
             _LOGGER.debug("Successfully connected to Dobiss")
 
-        except:
+        except Exception:
             _LOGGER.exception("Can not connect to Dobiss")
             self.available = False
             raise

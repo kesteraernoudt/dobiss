@@ -1,15 +1,12 @@
 """Support for dobiss switchs."""
-
-from homeassistant.components.switch import SwitchEntity
-
-from .const import DOMAIN, KEY_API
-
 import logging
 
-from dobissapi import (
-    DobissSwitch,
-    ICON_FROM_DOBISS,
-)
+from dobissapi import DobissSwitch
+from dobissapi import ICON_FROM_DOBISS
+from homeassistant.components.switch import SwitchEntity
+
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 

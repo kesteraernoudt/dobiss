@@ -1,5 +1,6 @@
 {
-  "python.linting.pylintEnabled": true,
+  "python.linting.pylintEnabled": false,
   "python.linting.enabled": true,
-  "python.pythonPath": "/usr/local/bin/python"
+  "python.pythonPath": "/usr/local/bin/python",
+  "python.linting.flake8Enabled": true
 }

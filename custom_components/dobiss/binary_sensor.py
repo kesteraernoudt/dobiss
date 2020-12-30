@@ -1,19 +1,15 @@
 """Support for dobiss switchs."""
-
-from homeassistant.components.binary_sensor import (
-    BinarySensorEntity,
-    DEVICE_CLASS_DOOR,
-)
-from homeassistant.core import callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-
-from .const import CONF_INVERT_BINARY_SENSOR, DOMAIN, KEY_API
-
 import logging
 
 from dobissapi import (
     DobissBinarySensor,
 )
+from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR
+
+from .const import CONF_INVERT_BINARY_SENSOR
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 

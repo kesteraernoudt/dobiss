@@ -1,21 +1,16 @@
 """Support for dobiss switchs."""
-
-from homeassistant.helpers.entity import Entity
-from homeassistant.const import (
-    DEVICE_CLASS_TEMPERATURE,
-    DEVICE_CLASS_ILLUMINANCE,
-    TEMP_CELSIUS,
-)
-
-from .const import DOMAIN, KEY_API
-
 import logging
 
-from dobissapi import (
-    DobissSensor,
-    DobissTempSensor,
-    DobissLightSensor,
-)
+from dobissapi import DobissLightSensor
+from dobissapi import DobissSensor
+from dobissapi import DobissTempSensor
+from homeassistant.const import DEVICE_CLASS_ILLUMINANCE
+from homeassistant.const import DEVICE_CLASS_TEMPERATURE
+from homeassistant.const import TEMP_CELSIUS
+from homeassistant.helpers.entity import Entity
+
+from .const import DOMAIN
+from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
