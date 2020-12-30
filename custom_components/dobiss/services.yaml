@@ -18,7 +18,7 @@ action_request:
   description: Sends an action request to the dobiss NXT server
   fields:
     address:
-      description: 'VERPLICHT, adres van de module of het NXT actie adres (>200)'
+      description: "VERPLICHT, adres van de module of het NXT actie adres (>200)"
       example: 1
     channel:
       description: VERPLICHT, module uitgang (start bij 0) of NXT uitgang nummer (start op 1),
@@ -27,10 +27,10 @@ action_request:
       description: VERPLICHT, actie id (0 = uit, 1 = aan, 2 = schakelen) // zie lijst van acties
       example: 2
     option1:
-      description: 'dimmer: waarde (0-100) / audio: volume (0-100) / temperatuur: stel temperatuur in of kalender'
+      description: "dimmer: waarde (0-100) / audio: volume (0-100) / temperatuur: stel temperatuur in of kalender"
       example: 50
     option2:
-      description: 'dimmer: soft start/stop (0-254) / audio: bron / temperatuur: periode'
+      description: "dimmer: soft start/stop (0-254) / audio: bron / temperatuur: periode"
       example: 50
 
 # from the Dobiss API info
@@ -67,7 +67,6 @@ status_request:
     channel:
       description: OPTIONEEL, module uitgang (start bij 0) of NXT uitgang nummer (start op 1)
       example: 1
-
 # from the Dobiss API info
 #{
 #     "address"   : OPTIONEEL, adres van de module of het NXT actie adres (>200),

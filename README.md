@@ -60,6 +60,7 @@ custom_components/dobiss/light.py
 ## Dependencies
 
 This integration will use the [pydobiss] python library which uses the native [Dobiss NXT API][dobiss_api].
+
 <!---->
 
 ## Credits

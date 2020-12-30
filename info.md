@@ -20,7 +20,6 @@
 | `climate`       | Dobiss climate control - if you have temperature zone's.         |
 | `cover`         | Dobiss covers - screens etc.                                     |
 
-
 {% if not installed %}
 
 ## Installation
@@ -35,6 +34,7 @@
 ## Dependencies
 
 This integration will use the [pydobiss] python library which uses the native [Dobiss NXT API][dobiss_api].
+
 <!---->
 
 ## Credits
