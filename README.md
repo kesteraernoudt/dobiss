@@ -14,6 +14,8 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
+[![dobiss][icon]][dobiss]
+
 **This component will set up the following platforms coming from a [dobiss] NXT server.**
 
 | Platform        | Description                                                      |
@@ -61,6 +63,8 @@ custom_components/dobiss/light.py
 
 This integration will use the [pydobiss] python library which uses the native [Dobiss NXT API][dobiss_api].
 
+[![dobiss_api][logo]][dobiss_api]
+
 <!---->
 
 ## Credits
@@ -95,3 +99,5 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [dobiss]: https://www.dobiss.com/en
 [pydobiss]: https://pypi.org/project/pydobiss/
 [dobiss_api]: http://support.dobiss.com/books/nl-dobiss-nxt/page/developer-api
+[icon]: https://brands.home-assistant.io/dobiss/icon.png
+[logo]: https://brands.home-assistant.io/_/dobiss/logo.png
