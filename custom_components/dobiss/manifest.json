@@ -8,5 +8,6 @@
   "zeroconf": [],
   "homekit": {},
   "dependencies": [],
+  "issue_tracker": "https://github.com/kesteraernoudt/dobiss/issues",
   "codeowners": ["@kesteraernoudt"]
 }
