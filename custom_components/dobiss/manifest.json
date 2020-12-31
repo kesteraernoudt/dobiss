@@ -3,7 +3,7 @@
   "name": "dobiss",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/dobiss",
-  "requirements": ["pydobiss==0.1.32"],
+  "requirements": ["pydobiss==0.1.33"],
   "ssdp": [],
   "zeroconf": [],
   "homekit": {},
