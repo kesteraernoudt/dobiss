@@ -2,5 +2,7 @@
   "python.linting.pylintEnabled": false,
   "python.linting.enabled": true,
   "python.pythonPath": "/usr/local/bin/python",
-  "python.linting.flake8Enabled": true
+  "python.linting.flake8Enabled": true,
+  "editor.formatOnSave": true,
+  "python.formatting.provider": "black"
 }
