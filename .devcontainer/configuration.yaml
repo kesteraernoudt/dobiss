@@ -1,3 +1,6 @@
+homeassistant:
+  customize: !include customize.yaml
+
 default_config:
 
 logger:
@@ -6,4 +9,6 @@ logger:
     custom_components.dobiss: debug
     dobissapi.dobissapi: debug
 # If you need to debug uncommment the line below (doc: https://www.home-assistant.io/integrations/debugpy/)
-# debugpy:
+debugpy:
+
+automation: !include automations.yaml

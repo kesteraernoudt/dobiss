@@ -17,7 +17,7 @@ from .const import KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["light", "switch", "sensor", "cover", "binary_sensor", "climate"]
+PLATFORMS = ["light", "switch", "sensor", "cover", "binary_sensor", "climate", "number"]
 
 SERVICE_ACTION_REQUEST = "action_request"
 SERVICE_STATUS_REQUEST = "status_request"

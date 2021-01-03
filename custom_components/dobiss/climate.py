@@ -63,11 +63,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if entity is None:
             raise ValueError(f"no entity found in {DOMAIN} that matches {entity_id}")
         time = call.data.get(ATTR_TIME, None)
-        if time is None:
-            if entity._dobisssensor.manual_mode:
-                time = entity._dobisssensor.time
-            else:
-                time = 30  # default to 30 minutes
         temp = call.data.get(ATTR_TEMPERATURE, entity._dobisssensor.asked)
         await entity._dobisssensor.set_temp_timer(temp, time)
 
