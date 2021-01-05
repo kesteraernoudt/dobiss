@@ -88,6 +88,7 @@ class HADobissCover(CoverEntity):
         attr.update(
             {prefix + str(key): val for key, val in self._down.attributes.items()}
         )
+        attr["Last Up"] = self._last_up
         return attr
 
     async def async_added_to_hass(self):
@@ -96,6 +97,7 @@ class HADobissCover(CoverEntity):
         self._down.register_callback(self.async_write_ha_state)
         self._up.register_callback(self.up_callback)
         self._down.register_callback(self.down_callback)
+        # todo: set _last_up with info coming from dobiss (not yet available in api now)
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
