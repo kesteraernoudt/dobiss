@@ -10,6 +10,7 @@ from homeassistant.components.cover import DEVICE_CLASS_WINDOW
 from homeassistant.components.cover import SUPPORT_CLOSE
 from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.components.cover import SUPPORT_STOP
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .const import KEY_API
@@ -36,7 +37,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         async_add_entities(entities)
 
 
-class HADobissCover(CoverEntity):
+class HADobissCover(CoverEntity, RestoreEntity):
     """Dobiss Cover device."""
 
     should_poll = False
@@ -98,6 +99,10 @@ class HADobissCover(CoverEntity):
         self._up.register_callback(self.up_callback)
         self._down.register_callback(self.down_callback)
         # todo: set _last_up with info coming from dobiss (not yet available in api now)
+        # so for now, just restore the previous known last state, and hope the cover didn't move
+        last_state = await self.async_get_last_state()
+        if last_state:
+            self._last_up = last_state.attributes.get("last_up")
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
