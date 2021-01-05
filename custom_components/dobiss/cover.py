@@ -88,7 +88,7 @@ class HADobissCover(CoverEntity):
         attr.update(
             {prefix + str(key): val for key, val in self._down.attributes.items()}
         )
-        attr["Last Up"] = self._last_up
+        attr["last_up"] = self._last_up
         return attr
 
     async def async_added_to_hass(self):
