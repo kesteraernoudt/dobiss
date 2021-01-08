@@ -4,10 +4,14 @@ from asyncio import gather
 
 import voluptuous as vol
 from dobissapi import DobissAPI
+from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.config_validation import entity_ids
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import DEFAULT_INVERT_BINARY_SENSOR
@@ -22,12 +26,15 @@ PLATFORMS = ["light", "switch", "sensor", "cover", "binary_sensor", "climate", "
 SERVICE_ACTION_REQUEST = "action_request"
 SERVICE_STATUS_REQUEST = "status_request"
 SERVICE_FORCE_UPDATE = "force_update"
+SERVICE_TURN_ON = "turn_on"
 
 ATTR_ADDRESS = "address"
 ATTR_CHANNEL = "channel"
 ATTR_ACTION = "action"
 ATTR_OPTION1 = "option1"
 ATTR_OPTION2 = "option2"
+ATTR_DELAYON = "delayon"
+ATTR_DELAYOFF = "delayoff"
 
 ACTION_REQUEST_SCHEMA = vol.Schema(
     vol.All(
@@ -48,6 +55,20 @@ STATUS_REQUEST_SCHEMA = vol.Schema(
         }
     )
 )
+TURN_ON_SCHEMA = vol.Schema(
+    vol.All(
+        {
+            vol.Required(ATTR_ENTITY_ID): vol.Coerce(entity_ids),
+            vol.Optional(ATTR_BRIGHTNESS): vol.Coerce(int),
+            vol.Optional(ATTR_DELAYON): vol.Coerce(int),
+            vol.Optional(ATTR_DELAYOFF): vol.Coerce(int),
+        }
+    )
+)
+
+SERVICE_TO_METHOD = {
+    SERVICE_TURN_ON: {"method": "turn_on_service", "schema": TURN_ON_SCHEMA}
+}
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -102,6 +123,7 @@ class HADobiss:
         self.api = None
         self.available = False
         self.unsub = None
+        self.devices = []
 
     @property
     def host(self):
@@ -190,6 +212,20 @@ class HADobiss:
             handle_status_request,
             schema=STATUS_REQUEST_SCHEMA,
         )
+
+        @callback
+        async def service_handler(service):
+            method = SERVICE_TO_METHOD.get(service.service)
+            data = service.data.copy()
+            data["method"] = method["method"]
+            async_dispatcher_send(self.hass, DOMAIN, data)
+
+        for service in SERVICE_TO_METHOD:
+            schema = SERVICE_TO_METHOD[service]["schema"]
+            self.hass.services.async_register(
+                DOMAIN, service, service_handler, schema=schema
+            )
+
         return True
 
     def add_options(self):

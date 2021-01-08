@@ -4,6 +4,10 @@ import logging
 from dobissapi import DobissSwitch
 from dobissapi import ICON_FROM_DOBISS
 from homeassistant.components.switch import SwitchEntity
+from homeassistant.const import ATTR_ENTITY_ID
+from homeassistant.const import ENTITY_MATCH_ALL
+from homeassistant.const import ENTITY_MATCH_NONE
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN
 from .const import KEY_API
@@ -60,10 +64,33 @@ class HADobissSwitch(SwitchEntity):
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
         self._dobissswitch.register_callback(self.async_write_ha_state)
+        self.async_on_remove(
+            async_dispatcher_connect(self.hass, DOMAIN, self.signal_handler)
+        )
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
         self._dobissswitch.remove_callback(self.async_write_ha_state)
+
+    async def signal_handler(self, data):
+        """Handle domain-specific signal by calling appropriate method."""
+        entity_ids = data[ATTR_ENTITY_ID]
+
+        if entity_ids == ENTITY_MATCH_NONE:
+            return
+
+        if entity_ids == ENTITY_MATCH_ALL or self.entity_id in entity_ids:
+            params = {
+                key: value
+                for key, value in data.items()
+                if key not in ["entity_id", "method"]
+            }
+            await getattr(self, data["method"])(**params)
+
+    async def turn_on_service(self, brightness=None, delayon=None, delayoff=None):
+        await self._dobissswitch.turn_on(
+            brightness=brightness, delayon=delayon, delayoff=delayoff
+        )
 
     @property
     def is_on(self):

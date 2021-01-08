@@ -1,6 +1,22 @@
 force_update:
   description: Force all entities to update their status
 
+turn_on:
+  description: Turn a dobiss output on, with optional delay in on or off
+  fields:
+    entity_id:
+      description: Mandatory, the entity id to turn on
+      example: light.bureel
+    brightness:
+      description: Optional, if it's a dimmable object, the brightness
+      example: 25
+    delayon:
+      description: Optional, number of seconds to wait before actually turning on
+      example: 10
+    delayoff:
+      description: Optional, number of seconds to wait before turning the entity off again
+      example: 60
+
 set_hvac_temp_timer:
   description: Set the temperature and time to stay in manual mode for a specific zone
   fields:
