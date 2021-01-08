@@ -11,10 +11,10 @@ turn_on:
       description: Optional, if it's a dimmable object, the brightness
       example: 25
     delayon:
-      description: Optional, number of seconds to wait before actually turning on
+      description: Optional, number of seconds to wait before actually turning on (more than 120 seconds is rounded to max 120 minutes)
       example: 10
     delayoff:
-      description: Optional, number of seconds to wait before turning the entity off again
+      description: Optional, number of seconds to wait before turning the entity off again (more than 120 seconds is rounded to max 120 minutes)
       example: 60
 
 set_hvac_temp_timer:
