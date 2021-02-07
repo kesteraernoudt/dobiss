@@ -23,7 +23,8 @@
     "step": {
       "init": {
         "data": {
-          "invert_binary_sensor": "Invert binary sensor state"
+          "invert_binary_sensor": "Invert binary sensor state",
+          "send_end_position_cover": "Set Cover End position after move"
         }
       }
     }

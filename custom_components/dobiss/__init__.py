@@ -13,7 +13,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.config_validation import entity_ids
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
+from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_INVERT_BINARY_SENSOR
+from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_INVERT_BINARY_SENSOR
 from .const import DEVICES
 from .const import DOMAIN
@@ -229,12 +231,18 @@ class HADobiss:
         return True
 
     def add_options(self):
-        """Add options for Glances integration."""
-        if not self.config_entry.options:
-            options = {CONF_INVERT_BINARY_SENSOR: DEFAULT_INVERT_BINARY_SENSOR}
-            self.hass.config_entries.async_update_entry(
-                self.config_entry, options=options
-            )
+        """Add options for dobiss integration."""
+        options = (
+            self.config_entry.options.copy()
+            if self.config_entry.options is not None
+            else {}
+        )
+        if CONF_INVERT_BINARY_SENSOR not in options:
+            options[CONF_INVERT_BINARY_SENSOR] = DEFAULT_INVERT_BINARY_SENSOR
+        if CONF_COVER_SET_END_POSITION not in options:
+            options[CONF_COVER_SET_END_POSITION] = DEFAULT_COVER_SET_END_POSITION
+
+        self.hass.config_entries.async_update_entry(self.config_entry, options=options)
 
     @staticmethod
     async def update_listener(hass, entry):

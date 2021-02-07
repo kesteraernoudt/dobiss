@@ -12,6 +12,7 @@ from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.components.cover import SUPPORT_STOP
 from homeassistant.helpers.restore_state import RestoreEntity
 
+from .const import CONF_COVER_SET_END_POSITION
 from .const import DOMAIN
 from .const import KEY_API
 
@@ -32,7 +33,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             # only add the up cover, and his buddy is down
             if d.icons_id == DOBISS_UP:
                 # _LOGGER.warn(f"set up dobiss cover {d.name} and {d.buddy.name}")
-                entities.append(HADobissCover(d, d.buddy))
+                entities.append(HADobissCover(d, d.buddy, config_entry))
     if entities:
         async_add_entities(entities)
 
@@ -44,7 +45,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
 
     supported_features = SUPPORT_STOP | SUPPORT_OPEN | SUPPORT_CLOSE
 
-    def __init__(self, up: DobissSwitch, down: DobissSwitch):
+    def __init__(self, up: DobissSwitch, down: DobissSwitch, config_entry):
         """Init dobiss Switch device."""
         super().__init__()
         # do some hacky check to see which type it is --> todo: make this flexible!
@@ -54,6 +55,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
         self._device_class = DEVICE_CLASS_SHADE
         self._is_velux = False
         self._name = up.name
+        self._config_entry = config_entry
         if up.name.endswith(" op"):
             self._device_class = DEVICE_CLASS_SHADE
             self._name = up.name[: -len(" op")]
@@ -128,6 +130,10 @@ class HADobissCover(CoverEntity, RestoreEntity):
 
     @property
     def is_closed(self):
+        if self._down.value is None:
+            return None
+        if self._config_entry.options.get(CONF_COVER_SET_END_POSITION):
+            return not self._last_up and self._down.value == 0
         """ Unknown """
         return None
 
