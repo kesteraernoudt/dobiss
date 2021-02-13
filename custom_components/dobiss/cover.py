@@ -97,14 +97,15 @@ class HADobissCover(CoverEntity, RestoreEntity):
             {prefix + str(key): val for key, val in self._down.attributes.items()}
         )
         attr["last_up"] = self._last_up
+        # attr["delta"] = self._delta
         return attr
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
-        self._up.register_callback(self.async_write_ha_state)
-        self._down.register_callback(self.async_write_ha_state)
         self._up.register_callback(self.up_callback)
         self._down.register_callback(self.down_callback)
+        self._up.register_callback(self.async_write_ha_state)
+        self._down.register_callback(self.async_write_ha_state)
         # todo: set _last_up with info coming from dobiss (not yet available in api now)
         # so for now, just restore the previous known last state, and hope the cover didn't move
         last_state = await self.async_get_last_state()
@@ -135,17 +136,18 @@ class HADobissCover(CoverEntity, RestoreEntity):
 
     @property
     def is_closed(self):
-        if self._down.value is None:
+        if self._down.value is None or self._up.value is None:
+            return None
+        if self._down.value > 0 or self._up.value > 0:
             return None
         if self._config_entry.options.get(CONF_COVER_SET_END_POSITION) or (
-            not self._is_velux
-            and self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
+            self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
             and self._delta is not None
             and self._delta
             > dt.timedelta(seconds=self._config_entry.options.get(CONF_COVER_CLOSETIME))
         ):
-            return not self._last_up and self._down.value == 0
-        """ Unknown """
+            return not self._last_up
+        """ stopped halfway """
         return None
 
     @property
