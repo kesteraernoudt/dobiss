@@ -10,10 +10,12 @@ from homeassistant import exceptions
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 
+from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import CONF_SECRET
 from .const import CONF_SECURE
+from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_INVERT_BINARY_SENSOR
 from .const import DOMAIN
@@ -134,6 +136,12 @@ class DobissOptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_INVERT_BINARY_SENSOR, DEFAULT_INVERT_BINARY_SENSOR
                     ),
                 ): cv.boolean,
+                vol.Required(
+                    CONF_COVER_CLOSETIME,
+                    default=self.config_entry.options.get(
+                        CONF_COVER_CLOSETIME, DEFAULT_COVER_CLOSETIME
+                    ),
+                ): cv.positive_int,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)

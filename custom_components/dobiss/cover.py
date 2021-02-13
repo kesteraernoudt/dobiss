@@ -1,4 +1,5 @@
 """Support for dobiss covers."""
+import datetime as dt
 import logging
 from asyncio import wait
 
@@ -11,7 +12,9 @@ from homeassistant.components.cover import SUPPORT_CLOSE
 from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.components.cover import SUPPORT_STOP
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util import dt as dt_util
 
+from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import DOMAIN
 from .const import KEY_API
@@ -67,6 +70,8 @@ class HADobissCover(CoverEntity, RestoreEntity):
         self._up = up
         self._down = down
         self._last_up = False
+        self._start_time = None
+        self._delta = None
 
     @property
     def device_info(self):
@@ -132,7 +137,12 @@ class HADobissCover(CoverEntity, RestoreEntity):
     def is_closed(self):
         if self._down.value is None:
             return None
-        if self._config_entry.options.get(CONF_COVER_SET_END_POSITION):
+        if self._config_entry.options.get(CONF_COVER_SET_END_POSITION) or (
+            self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
+            and self._delta is not None
+            and self._delta
+            > dt.timedelta(seconds=self._config_entry.options.get(CONF_COVER_CLOSETIME))
+        ):
             return not self._last_up and self._down.value == 0
         """ Unknown """
         return None
@@ -162,10 +172,20 @@ class HADobissCover(CoverEntity, RestoreEntity):
     def up_callback(self):
         if self._up.is_on and not self._down.is_on:
             self._last_up = True
+            self._start_time = dt_util.utcnow()
+            self._delta = None
+        elif not self._up.is_on and not self._down.is_on:
+            if self._start_time is not None:
+                self._delta = dt_util.utcnow() - self._start_time
 
     def down_callback(self):
         if self._down.is_on and not self._up.is_on:
             self._last_up = False
+            self._start_time = dt_util.utcnow()
+            self._delta = None
+        elif not self._up.is_on and not self._down.is_on:
+            if self._start_time is not None:
+                self._delta = dt_util.utcnow() - self._start_time
 
     # These methods allow HA to tell the actual device what to do. In this case, move
     # the cover to the desired position, or open and close it all the way.
