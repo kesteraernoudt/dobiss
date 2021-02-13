@@ -138,7 +138,8 @@ class HADobissCover(CoverEntity, RestoreEntity):
         if self._down.value is None:
             return None
         if self._config_entry.options.get(CONF_COVER_SET_END_POSITION) or (
-            self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
+            not self._is_velux
+            and self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
             and self._delta is not None
             and self._delta
             > dt.timedelta(seconds=self._config_entry.options.get(CONF_COVER_CLOSETIME))
@@ -172,19 +173,21 @@ class HADobissCover(CoverEntity, RestoreEntity):
     def up_callback(self):
         if self._up.is_on and not self._down.is_on:
             self._last_up = True
-            self._start_time = dt_util.utcnow()
-            self._delta = None
+            if not self._is_velux:
+                self._start_time = dt_util.utcnow()
+                self._delta = None
         elif not self._up.is_on and not self._down.is_on:
-            if self._start_time is not None:
+            if not self._is_velux and self._start_time is not None:
                 self._delta = dt_util.utcnow() - self._start_time
 
     def down_callback(self):
         if self._down.is_on and not self._up.is_on:
             self._last_up = False
-            self._start_time = dt_util.utcnow()
-            self._delta = None
+            if not self._is_velux:
+                self._start_time = dt_util.utcnow()
+                self._delta = None
         elif not self._up.is_on and not self._down.is_on:
-            if self._start_time is not None:
+            if not self._is_velux and self._start_time is not None:
                 self._delta = dt_util.utcnow() - self._start_time
 
     # These methods allow HA to tell the actual device what to do. In this case, move
