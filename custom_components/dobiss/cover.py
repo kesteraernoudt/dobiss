@@ -1,5 +1,4 @@
 """Support for dobiss covers."""
-import datetime as dt
 import logging
 from asyncio import wait
 
@@ -71,7 +70,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
         self._down = down
         self._last_up = False
         self._start_time = None
-        self._delta = None
+        self._delta = 0
 
     @property
     def device_info(self):
@@ -97,7 +96,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
             {prefix + str(key): val for key, val in self._down.attributes.items()}
         )
         attr["last_up"] = self._last_up
-        # attr["delta"] = self._delta
+        attr["delta"] = self._delta
         return attr
 
     async def async_added_to_hass(self):
@@ -111,6 +110,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
         last_state = await self.async_get_last_state()
         if last_state:
             self._last_up = last_state.attributes.get("last_up")
+            self._delta = last_state.attributes.get("delta", 0)
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
@@ -143,8 +143,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
         if self._config_entry.options.get(CONF_COVER_SET_END_POSITION) or (
             self._config_entry.options.get(CONF_COVER_CLOSETIME) > 0
             and self._delta is not None
-            and self._delta
-            > dt.timedelta(seconds=self._config_entry.options.get(CONF_COVER_CLOSETIME))
+            and self._delta > self._config_entry.options.get(CONF_COVER_CLOSETIME)
         ):
             return not self._last_up
         """ stopped halfway """
@@ -164,6 +163,11 @@ class HADobissCover(CoverEntity, RestoreEntity):
             return None
         return self._up.value > 0 if self._up.value else None
 
+    @property
+    def assumed_state(self):
+        """Return True because covers can be stopped midway."""
+        return True
+
     async def async_toggle(self, **kwargs):
         """Toggle the entity."""
         if self._last_up:
@@ -177,20 +181,24 @@ class HADobissCover(CoverEntity, RestoreEntity):
             self._last_up = True
             if not self._is_velux:
                 self._start_time = dt_util.utcnow()
-                self._delta = None
+                self._delta = 0
         elif not self._up.is_on and not self._down.is_on:
             if not self._is_velux and self._start_time is not None:
-                self._delta = dt_util.utcnow() - self._start_time
+                self._delta = round(
+                    (dt_util.utcnow() - self._start_time).total_seconds()
+                )
 
     def down_callback(self):
         if self._down.is_on and not self._up.is_on:
             self._last_up = False
             if not self._is_velux:
                 self._start_time = dt_util.utcnow()
-                self._delta = None
+                self._delta = 0
         elif not self._up.is_on and not self._down.is_on:
             if not self._is_velux and self._start_time is not None:
-                self._delta = dt_util.utcnow() - self._start_time
+                self._delta = round(
+                    (dt_util.utcnow() - self._start_time).total_seconds()
+                )
 
     # These methods allow HA to tell the actual device what to do. In this case, move
     # the cover to the desired position, or open and close it all the way.
