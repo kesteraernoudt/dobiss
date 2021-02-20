@@ -260,6 +260,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self._travel_time_up = DEFAULT_COVER_CLOSETIME
         self._unsubscribe_auto_updater = None
         self.tc = TravelCalculator(self._travel_time_down, self._travel_time_up)
+        self._external_signal = False
 
     @property
     def device_info(self):
@@ -296,8 +297,6 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self._down.register_callback(self.down_callback)
         self._up.register_callback(self.async_write_ha_state)
         self._down.register_callback(self.async_write_ha_state)
-        # todo: set _last_up with info coming from dobiss (not yet available in api now)
-        # so for now, just restore the previous known last state, and hope the cover didn't move
         """ Only cover's position matters.             """
         """ The rest is calculated from this attribute."""
         old_state = await self.async_get_last_state()
@@ -451,8 +450,9 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
     async def auto_stop_if_necessary(self):
         """Do auto stop if necessary."""
         if self.position_reached():
-            _LOGGER.debug("auto_stop_if_necessary :: calling stop command")
-            await self._async_handle_command(SERVICE_STOP_COVER)
+            if not self._external_signal:
+                _LOGGER.debug("auto_stop_if_necessary :: calling stop command")
+                await self._async_handle_command(SERVICE_STOP_COVER)
             self.tc.stop()
 
     async def _async_handle_command(self, command, *args):
@@ -474,6 +474,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
             await self._up.turn_off()
             await self._down.turn_off()
 
+        self._external_signal = False
         _LOGGER.debug("_async_handle_command :: %s", cmd)
 
         # Update state of entity
@@ -481,13 +482,27 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
 
     # callbacks
     def up_callback(self):
-        if self._up.is_on and not self._down.is_on:
+        _LOGGER.debug("up_callback")
+        if self._up.is_on and not self._down.is_on and not self.is_opening:
+            _LOGGER.debug("up_callback start when not opening")
+            self._external_signal = True
             self.tc.start_travel_up()
-        elif not self._up.is_on and not self._down.is_on:
+            self.start_auto_updater()
+        elif not self._up.is_on and not self._down.is_on and self.tc.is_traveling():
+            _LOGGER.debug("up_callback stop when travelling")
+            self._external_signal = True
             self.tc.stop()
+            self.stop_auto_updater()
 
     def down_callback(self):
-        if self._down.is_on and not self._up.is_on:
+        _LOGGER.debug("down_callback")
+        if self._down.is_on and not self._up.is_on and not self.is_closing:
+            _LOGGER.debug("down_callback start when not closing")
+            self._external_signal = True
             self.tc.start_travel_down()
-        elif not self._up.is_on and not self._down.is_on:
+            self.start_auto_updater()
+        elif not self._up.is_on and not self._down.is_on and self.tc.is_traveling():
+            _LOGGER.debug("down_callback stop when not travelling")
+            self._external_signal = True
             self.tc.stop()
+            self.stop_auto_updater()
