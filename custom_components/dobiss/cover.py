@@ -1,10 +1,14 @@
 """Support for dobiss covers."""
+from datetime import timedelta
+from homeassistant.core import callback
+from homeassistant.helpers.event import async_track_utc_time_change, async_track_time_interval
+
 import logging
 from asyncio import wait
 
 from dobissapi import DOBISS_UP
 from dobissapi import DobissSwitch
-from homeassistant.components.cover import CoverEntity
+from homeassistant.components.cover import ATTR_CURRENT_POSITION, ATTR_POSITION, CoverEntity, SUPPORT_SET_POSITION
 from homeassistant.components.cover import DEVICE_CLASS_SHADE
 from homeassistant.components.cover import DEVICE_CLASS_WINDOW
 from homeassistant.components.cover import SUPPORT_CLOSE
@@ -12,8 +16,14 @@ from homeassistant.components.cover import SUPPORT_OPEN
 from homeassistant.components.cover import SUPPORT_STOP
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
+from homeassistant.const import (
+    CONF_NAME,
+    SERVICE_CLOSE_COVER,
+    SERVICE_OPEN_COVER,
+    SERVICE_STOP_COVER,
+)
 
-from .const import CONF_COVER_CLOSETIME
+from .const import CONF_COVER_CLOSETIME, CONF_TRAVELLING_TIME_DOWN, CONF_TRAVELLING_TIME_UP, DEFAULT_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import DOMAIN
 from .const import KEY_API
@@ -35,7 +45,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             # only add the up cover, and his buddy is down
             if d.icons_id == DOBISS_UP:
                 # _LOGGER.warn(f"set up dobiss cover {d.name} and {d.buddy.name}")
-                entities.append(HADobissCover(d, d.buddy, config_entry))
+                if d.name.endswith(" op") or d.name.endswith(" open"):
+                    entities.append(HADobissCover(d, d.buddy, config_entry))
+                else:
+                    entities.append(HADobissCoverPosition(d, d.buddy, config_entry))
     if entities:
         async_add_entities(entities)
 
@@ -216,3 +229,252 @@ class HADobissCover(CoverEntity, RestoreEntity):
             await wait([self._up.turn_on(), self._down.turn_on()])
         else:
             await wait([self._up.turn_off(), self._down.turn_off()])
+
+
+class HADobissCoverPosition(CoverEntity, RestoreEntity):
+    """Dobiss Cover device."""
+
+    should_poll = False
+
+    supported_features = SUPPORT_STOP | SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_SET_POSITION
+
+    def __init__(self, up: DobissSwitch, down: DobissSwitch, config_entry):
+        """Init dobiss Switch device."""
+        from xknx.devices import TravelCalculator
+        super().__init__()
+        # do some hacky check to see which type it is --> todo: make this flexible!
+        # from dobiss: if it is a shade, up and down have the same name
+        # if it is a velux shade, up and down end in ' op' and ' neer'
+        # if it is a velux window, up and down end in ' open' and ' dicht'
+        self._device_class = DEVICE_CLASS_SHADE
+        self._name = up.name
+        self._config_entry = config_entry
+        self._up = up
+        self._down = down
+        self._travel_time_down = DEFAULT_COVER_CLOSETIME
+        self._travel_time_up = DEFAULT_COVER_CLOSETIME
+        self._unsubscribe_auto_updater = None
+        self.tc = TravelCalculator(self._travel_time_down, self._travel_time_up)
+
+
+    @property
+    def device_info(self):
+        """Information about this entity/device."""
+        return {
+            "identifiers": {(DOMAIN, self._up.object_id)},
+            "name": self.name,
+            "manufacturer": "dobiss",
+        }
+
+    @property
+    def device_class(self):
+        """Return the class of this device, from component DEVICE_CLASSES."""
+        return self._device_class
+
+    @property
+    def device_state_attributes(self):
+        """Return supported attributes."""
+        prefix = "up_"
+        attr = {prefix + str(key): val for key, val in self._up.attributes.items()}
+        prefix = "down_"
+        attr.update(
+            {prefix + str(key): val for key, val in self._down.attributes.items()}
+        )
+        if self._travel_time_down is not None:
+            attr[CONF_TRAVELLING_TIME_DOWN] = self._travel_time_down
+        if self._travel_time_up is not None:
+            attr[CONF_TRAVELLING_TIME_UP] = self._travel_time_up
+        return attr
+
+    async def async_added_to_hass(self):
+        """Run when this Entity has been added to HA."""
+        self._up.register_callback(self.up_callback)
+        self._down.register_callback(self.down_callback)
+        self._up.register_callback(self.async_write_ha_state)
+        self._down.register_callback(self.async_write_ha_state)
+        # todo: set _last_up with info coming from dobiss (not yet available in api now)
+        # so for now, just restore the previous known last state, and hope the cover didn't move
+        """ Only cover's position matters.             """
+        """ The rest is calculated from this attribute."""
+        old_state = await self.async_get_last_state()
+        _LOGGER.debug('async_added_to_hass :: oldState %s', old_state)
+        if (
+                old_state is not None and
+                self.tc is not None and
+                old_state.attributes.get(ATTR_CURRENT_POSITION) is not None):
+            self.tc.set_position(int(
+                old_state.attributes.get(ATTR_CURRENT_POSITION)))
+
+    async def async_will_remove_from_hass(self):
+        """Entity being removed from hass."""
+        self._up.remove_callback(self.async_write_ha_state)
+        self._down.remove_callback(self.async_write_ha_state)
+        self._up.remove_callback(self.up_callback)
+        self._down.remove_callback(self.down_callback)
+
+    @property
+    def name(self):
+        """Return the display name of this cover."""
+        return self._name
+
+    @property
+    def unique_id(self):
+        """Return a unique ID."""
+        return f"{self._up.object_id}-{self._down.object_id}"
+
+    @property
+    def available(self) -> bool:
+        """Return True."""
+        return True
+
+    @property
+    def is_closed(self):
+        return self.tc.is_closed()
+
+    @property
+    def is_closing(self):
+        """Return if the cover is closing or not."""
+        from xknx.devices import TravelStatus
+        return self.tc.is_traveling() and \
+               self.tc.travel_direction == TravelStatus.DIRECTION_DOWN
+
+    @property
+    def is_opening(self):
+        """Return if the cover is opening or not."""
+        from xknx.devices import TravelStatus
+        return self.tc.is_traveling() and \
+               self.tc.travel_direction == TravelStatus.DIRECTION_UP
+
+    @property
+    def assumed_state(self):
+        """Return True because covers can be stopped midway."""
+        return True
+
+    @property
+    def current_cover_position(self):
+        """Return the current position of the cover."""
+        return self.tc.current_position()
+
+    async def async_set_cover_position(self, **kwargs):
+        """Move the cover to a specific position."""
+        if ATTR_POSITION in kwargs:
+            position = kwargs[ATTR_POSITION]
+            _LOGGER.debug('async_set_cover_position: %d', position)
+            await self.set_position(position)
+
+    async def async_close_cover(self, **kwargs):
+        """Turn the device close."""
+        _LOGGER.debug('async_close_cover')
+        self.tc.start_travel_down()
+
+        self.start_auto_updater()
+        await self._async_handle_command(SERVICE_CLOSE_COVER)
+
+    async def async_open_cover(self, **kwargs):
+        """Turn the device open."""
+        _LOGGER.debug('async_open_cover')
+        self.tc.start_travel_up()
+
+        self.start_auto_updater()
+        await self._async_handle_command(SERVICE_OPEN_COVER)
+
+    async def async_stop_cover(self, **kwargs):
+        """Turn the device stop."""
+        _LOGGER.debug('async_stop_cover')
+        if self.tc.is_traveling():
+            self.tc.stop()
+            self.stop_auto_updater()
+        await self._async_handle_command(SERVICE_STOP_COVER)
+
+    async def set_position(self, position):
+        _LOGGER.debug('set_position')
+        """Move cover to a designated position."""
+        current_position = self.tc.current_position()
+        _LOGGER.debug('set_position :: current_position: %d, new_position: %d',
+                      current_position, position)
+        command = None
+        if position < current_position:
+            command = SERVICE_CLOSE_COVER
+        elif position > current_position:
+            command = SERVICE_OPEN_COVER
+        if command is not None:
+            self.start_auto_updater()
+            self.tc.start_travel(position)
+            _LOGGER.debug('set_position :: command %s', command)
+            await self._async_handle_command(command)
+        return
+
+    def start_auto_updater(self):
+        """Start the autoupdater to update HASS while cover is moving."""
+        _LOGGER.debug('start_auto_updater')
+        if self._unsubscribe_auto_updater is None:
+            _LOGGER.debug('init _unsubscribe_auto_updater')
+            interval = timedelta(seconds=0.1)
+            self._unsubscribe_auto_updater = async_track_time_interval(
+                self.hass, self.auto_updater_hook, interval)
+
+    @callback
+    def auto_updater_hook(self, now):
+        """Call for the autoupdater."""
+        _LOGGER.debug('auto_updater_hook')
+        self.async_schedule_update_ha_state()
+        if self.position_reached():
+            _LOGGER.debug('auto_updater_hook :: position_reached')
+            self.stop_auto_updater()
+        self.hass.async_create_task(self.auto_stop_if_necessary())
+
+    def stop_auto_updater(self):
+        """Stop the autoupdater."""
+        _LOGGER.debug('stop_auto_updater')
+        if self._unsubscribe_auto_updater is not None:
+            self._unsubscribe_auto_updater()
+            self._unsubscribe_auto_updater = None
+
+    def position_reached(self):
+        """Return if cover has reached its final position."""
+        return self.tc.position_reached()
+
+    async def auto_stop_if_necessary(self):
+        """Do auto stop if necessary."""
+        if self.position_reached():
+            _LOGGER.debug('auto_stop_if_necessary :: calling stop command')
+            await self._async_handle_command(SERVICE_STOP_COVER)
+            self.tc.stop()
+
+
+    async def _async_handle_command(self, command, *args):
+        if command == "close_cover":
+            cmd = "DOWN"
+            self._state = False
+            await self._up.turn_off()
+            await self._down.turn_on()
+
+        elif command == "open_cover":
+            cmd = "UP"
+            self._state = True
+            await self._up.turn_on()
+            await self._down.turn_off()
+
+        elif command == "stop_cover":
+            cmd = "STOP"
+            self._state = True
+            await self._up.turn_off()
+            await self._down.turn_off()
+
+        _LOGGER.debug('_async_handle_command :: %s', cmd)
+
+        # Update state of entity
+        self.async_write_ha_state()
+
+    # callbacks
+    def up_callback(self):
+        if self._up.is_on and not self._down.is_on:
+            self.tc.start_travel_up()
+        elif not self._up.is_on and not self._down.is_on:
+            self.tc.stop()
+
+    def down_callback(self):
+        if self._down.is_on and not self._up.is_on:
+            self.tc.start_travel_down()
+        elif not self._up.is_on and not self._down.is_on:
+            self.tc.stop()
