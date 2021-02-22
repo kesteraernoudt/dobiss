@@ -247,10 +247,6 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         from xknx.devices import TravelCalculator
 
         super().__init__()
-        # do some hacky check to see which type it is --> todo: make this flexible!
-        # from dobiss: if it is a shade, up and down have the same name
-        # if it is a velux shade, up and down end in ' op' and ' neer'
-        # if it is a velux window, up and down end in ' open' and ' dicht'
         self._device_class = DEVICE_CLASS_SHADE
         self._name = up.name
         self._config_entry = config_entry
@@ -285,11 +281,32 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         attr.update(
             {prefix + str(key): val for key, val in self._down.attributes.items()}
         )
-        if self._travel_time_down is not None:
-            attr[CONF_TRAVELLING_TIME_DOWN] = self._travel_time_down
-        if self._travel_time_up is not None:
-            attr[CONF_TRAVELLING_TIME_UP] = self._travel_time_up
+        attr[CONF_TRAVELLING_TIME_DOWN] = self._travel_time_down
+        attr[CONF_TRAVELLING_TIME_UP] = self._travel_time_up
         return attr
+
+    def check_times_changed(self):
+        """check if we need to modify the TC."""
+        state = self.hass.states.get(self.entity_id)
+        if (
+            state is not None
+            and state.attributes.get(CONF_TRAVELLING_TIME_DOWN) is not None
+            and state.attributes.get(CONF_TRAVELLING_TIME_UP) is not None
+            and (
+                state.attributes.get(CONF_TRAVELLING_TIME_DOWN)
+                != self._travel_time_down
+                or state.attributes.get(CONF_TRAVELLING_TIME_UP) != self._travel_time_up
+                or self.tc.travel_time_down != self._travel_time_down
+                or self.tc.travel_time_up != self._travel_time_up
+            )
+        ):
+            _LOGGER.debug(
+                f"check_times_changed :: up {state.attributes.get(CONF_TRAVELLING_TIME_UP)} (was {self.tc.travel_time_up}); down {state.attributes.get(CONF_TRAVELLING_TIME_DOWN)} (was {self.tc.travel_time_down})"
+            )
+            self._travel_time_down = state.attributes.get(CONF_TRAVELLING_TIME_DOWN)
+            self._travel_time_up = state.attributes.get(CONF_TRAVELLING_TIME_UP)
+            self.tc.travel_time_down = self._travel_time_down
+            self.tc.travel_time_up = self._travel_time_up
 
     async def async_added_to_hass(self):
         """Run when this Entity has been added to HA."""
@@ -301,12 +318,27 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         """ The rest is calculated from this attribute."""
         old_state = await self.async_get_last_state()
         _LOGGER.debug("async_added_to_hass :: oldState %s", old_state)
-        if (
-            old_state is not None
-            and self.tc is not None
-            and old_state.attributes.get(ATTR_CURRENT_POSITION) is not None
-        ):
-            self.tc.set_position(int(old_state.attributes.get(ATTR_CURRENT_POSITION)))
+        if old_state is not None:
+            if (
+                self.tc is not None
+                and old_state.attributes.get(CONF_TRAVELLING_TIME_DOWN) is not None
+            ):
+                self._travel_time_down = old_state.attributes.get(
+                    CONF_TRAVELLING_TIME_DOWN
+                )
+            if (
+                self.tc is not None
+                and old_state.attributes.get(CONF_TRAVELLING_TIME_UP) is not None
+            ):
+                self._travel_time_up = old_state.attributes.get(CONF_TRAVELLING_TIME_UP)
+            self.check_times_changed()
+            if (
+                self.tc is not None
+                and old_state.attributes.get(ATTR_CURRENT_POSITION) is not None
+            ):
+                self.tc.set_position(
+                    int(old_state.attributes.get(ATTR_CURRENT_POSITION))
+                )
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
@@ -366,6 +398,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
 
     async def async_set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
+        self.check_times_changed()
         if ATTR_POSITION in kwargs:
             position = kwargs[ATTR_POSITION]
             _LOGGER.debug("async_set_cover_position: %d", position)
@@ -374,22 +407,23 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
     async def async_close_cover(self, **kwargs):
         """Turn the device close."""
         _LOGGER.debug("async_close_cover")
+        self.check_times_changed()
         self.tc.start_travel_down()
-
         self.start_auto_updater()
         await self._async_handle_command(SERVICE_CLOSE_COVER)
 
     async def async_open_cover(self, **kwargs):
         """Turn the device open."""
         _LOGGER.debug("async_open_cover")
+        self.check_times_changed()
         self.tc.start_travel_up()
-
         self.start_auto_updater()
         await self._async_handle_command(SERVICE_OPEN_COVER)
 
     async def async_stop_cover(self, **kwargs):
         """Turn the device stop."""
         _LOGGER.debug("async_stop_cover")
+        self.check_times_changed()
         if self.tc.is_traveling():
             self.tc.stop()
             self.stop_auto_updater()
@@ -398,6 +432,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
     async def set_position(self, position):
         _LOGGER.debug("set_position")
         """Move cover to a designated position."""
+        self.check_times_changed()
         current_position = self.tc.current_position()
         _LOGGER.debug(
             "set_position :: current_position: %d, new_position: %d",
@@ -456,27 +491,22 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
             self.tc.stop()
 
     async def _async_handle_command(self, command, *args):
+        _LOGGER.debug("_async_handle_command :: %s", command)
         if command == "close_cover":
-            cmd = "DOWN"
             self._state = False
             await self._up.turn_off()
             await self._down.turn_on()
 
         elif command == "open_cover":
-            cmd = "UP"
             self._state = True
             await self._up.turn_on()
             await self._down.turn_off()
 
         elif command == "stop_cover":
-            cmd = "STOP"
             self._state = True
             await self._up.turn_off()
             await self._down.turn_off()
-
         self._external_signal = False
-        _LOGGER.debug("_async_handle_command :: %s", cmd)
-
         # Update state of entity
         self.async_write_ha_state()
 
@@ -486,6 +516,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         if self._up.is_on and not self._down.is_on and not self.is_opening:
             _LOGGER.debug("up_callback start when not opening")
             self._external_signal = True
+            self.check_times_changed()
             self.tc.start_travel_up()
             self.start_auto_updater()
         elif not self._up.is_on and not self._down.is_on and self.tc.is_traveling():
@@ -499,6 +530,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         if self._down.is_on and not self._up.is_on and not self.is_closing:
             _LOGGER.debug("down_callback start when not closing")
             self._external_signal = True
+            self.check_times_changed()
             self.tc.start_travel_down()
             self.start_auto_updater()
         elif not self._up.is_on and not self._down.is_on and self.tc.is_traveling():

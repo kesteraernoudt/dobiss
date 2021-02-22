@@ -16,5 +16,5 @@ DEFAULT_COVER_SET_END_POSITION = False
 CONF_COVER_CLOSETIME = "cover_closetime"
 DEFAULT_COVER_CLOSETIME = 25
 
-CONF_TRAVELLING_TIME_DOWN = "travelling_time_up"
-CONF_TRAVELLING_TIME_UP = "travelling_time_down"
+CONF_TRAVELLING_TIME_DOWN = "travelling_time_down"
+CONF_TRAVELLING_TIME_UP = "travelling_time_up"
