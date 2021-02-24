@@ -364,7 +364,11 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
 
     @property
     def is_closed(self):
-        return self.tc.is_closed()
+        if self.tc.is_open():
+            return False
+        if self.tc.is_closed():
+            return True
+        return None
 
     @property
     def is_closing(self):
