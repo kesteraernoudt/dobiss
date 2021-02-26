@@ -257,6 +257,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self._unsubscribe_auto_updater = None
         self.tc = TravelCalculator(self._travel_time_down, self._travel_time_up)
         self._external_signal = False
+        self._last_up = False
 
     @property
     def device_info(self):
@@ -283,6 +284,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         )
         attr[CONF_TRAVELLING_TIME_DOWN] = self._travel_time_down
         attr[CONF_TRAVELLING_TIME_UP] = self._travel_time_up
+        attr["last_up"] = self._last_up
         return attr
 
     def check_times_changed(self):
@@ -339,6 +341,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
                 self.tc.set_position(
                     int(old_state.attributes.get(ATTR_CURRENT_POSITION))
                 )
+            self._last_up = old_state.attributes.get("last_up")
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
@@ -346,6 +349,13 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self._down.remove_callback(self.async_write_ha_state)
         self._up.remove_callback(self.up_callback)
         self._down.remove_callback(self.down_callback)
+
+    async def async_toggle(self, **kwargs):
+        """Toggle the entity."""
+        if self._last_up:
+            await self.async_close_cover(**kwargs)
+        else:
+            await self.async_open_cover(**kwargs)
 
     @property
     def name(self):
@@ -517,6 +527,8 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
     # callbacks
     def up_callback(self):
         _LOGGER.debug("up_callback")
+        if self._up.is_on and not self._down.is_on:
+            self._last_up = True
         if self._up.is_on and not self._down.is_on and not self.is_opening:
             _LOGGER.debug("up_callback start when not opening")
             self._external_signal = True
@@ -531,6 +543,8 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
 
     def down_callback(self):
         _LOGGER.debug("down_callback")
+        if self._down.is_on and not self._up.is_on:
+            self._last_up = False
         if self._down.is_on and not self._up.is_on and not self.is_closing:
             _LOGGER.debug("down_callback start when not closing")
             self._external_signal = True
