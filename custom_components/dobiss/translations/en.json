@@ -15,7 +15,8 @@
         "data": {
           "secret": "API secret",
           "host": "host",
-          "secure": "Use a secure connection"
+          "secure": "Use a secure connection",
+          "use_timed_covers": "Configure supported covers as timed covers"
         }
       }
     }

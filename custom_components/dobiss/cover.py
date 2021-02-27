@@ -24,9 +24,10 @@ from homeassistant.util import dt as dt_util
 
 from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
+from .const import CONF_COVER_USE_TIMED
 from .const import CONF_TRAVELLING_TIME_DOWN
 from .const import CONF_TRAVELLING_TIME_UP
-from .const import DEFAULT_COVER_CLOSETIME
+from .const import DEFAULT_COVER_TRAVELTIME
 from .const import DOMAIN
 from .const import KEY_API
 
@@ -47,7 +48,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             # only add the up cover, and his buddy is down
             if d.icons_id == DOBISS_UP:
                 # _LOGGER.warn(f"set up dobiss cover {d.name} and {d.buddy.name}")
-                if d.name.endswith(" op") or d.name.endswith(" open"):
+                if (
+                    d.name.endswith(" op")
+                    or d.name.endswith(" open")
+                    or (
+                        config_entry.data.get(CONF_COVER_USE_TIMED) is not None
+                        and not config_entry.data.get(CONF_COVER_USE_TIMED)
+                    )
+                ):
                     entities.append(HADobissCover(d, d.buddy, config_entry))
                 else:
                     entities.append(HADobissCoverPosition(d, d.buddy, config_entry))
@@ -252,8 +260,8 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self._config_entry = config_entry
         self._up = up
         self._down = down
-        self._travel_time_down = DEFAULT_COVER_CLOSETIME
-        self._travel_time_up = DEFAULT_COVER_CLOSETIME
+        self._travel_time_down = DEFAULT_COVER_TRAVELTIME
+        self._travel_time_up = DEFAULT_COVER_TRAVELTIME
         self._unsubscribe_auto_updater = None
         self.tc = TravelCalculator(self._travel_time_down, self._travel_time_up)
         self._external_signal = False

@@ -15,6 +15,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
+from .const import CONF_COVER_USE_TIMED
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
@@ -144,6 +145,9 @@ class HADobiss:
             )
             devices = self.api.get_all_devices()
             self.hass.data[DOMAIN][self.config_entry.entry_id][DEVICES] = devices
+            self.hass.data[DOMAIN][self.config_entry.entry_id][
+                CONF_COVER_USE_TIMED
+            ] = self.config_entry.data[CONF_COVER_USE_TIMED]
 
             # logger.setLevel(logging.DEBUG)
             await self.api.discovery()
