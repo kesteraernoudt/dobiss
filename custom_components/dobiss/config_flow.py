@@ -97,12 +97,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         fields[vol.Required(CONF_SECRET, default=user_input.get(CONF_SECRET))] = str
         fields[vol.Required(CONF_HOST, default=user_input.get(CONF_HOST))] = str
         fields[vol.Optional(CONF_SECURE, default=secure)] = bool
-        fields[
-            vol.Optional(
-                CONF_COVER_USE_TIMED,
-                default=user_input.get(CONF_SECRET, DEFAULT_COVER_USE_TIMED),
-            )
-        ] = bool
 
         # show the form if there were errors or at the first run
         return self.async_show_form(
@@ -150,6 +144,12 @@ class DobissOptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_COVER_CLOSETIME, DEFAULT_COVER_CLOSETIME
                     ),
                 ): cv.positive_int,
+                vol.Optional(
+                    CONF_COVER_USE_TIMED,
+                    default=self.config_entry.options.get(
+                        CONF_COVER_USE_TIMED, DEFAULT_COVER_USE_TIMED
+                    ),
+                ): cv.boolean,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)

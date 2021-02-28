@@ -146,11 +146,6 @@ class HADobiss:
             )
             devices = self.api.get_all_devices()
             self.hass.data[DOMAIN][self.config_entry.entry_id][DEVICES] = devices
-            self.hass.data[DOMAIN][self.config_entry.entry_id][CONF_COVER_USE_TIMED] = (
-                self.config_entry.data[CONF_COVER_USE_TIMED]
-                if CONF_COVER_USE_TIMED in self.config_entry.data
-                else DEFAULT_COVER_USE_TIMED
-            )
 
             # logger.setLevel(logging.DEBUG)
             await self.api.discovery()
@@ -252,6 +247,8 @@ class HADobiss:
             options[CONF_COVER_SET_END_POSITION] = DEFAULT_COVER_SET_END_POSITION
         if CONF_COVER_CLOSETIME not in options:
             options[CONF_COVER_CLOSETIME] = DEFAULT_COVER_CLOSETIME
+        if CONF_COVER_USE_TIMED not in options:
+            options[CONF_COVER_USE_TIMED] = DEFAULT_COVER_USE_TIMED
 
         self.hass.config_entries.async_update_entry(self.config_entry, options=options)
 

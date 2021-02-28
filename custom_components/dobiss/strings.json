@@ -6,8 +6,7 @@
         "data": {
           "host": "[%key:common::config_flow::data::host%]",
           "username": "[%key:common::config_flow::data::username%]",
-          "password": "[%key:common::config_flow::data::password%]",
-          "use_timed_covers": "Configure supported covers as timed covers"
+          "password": "[%key:common::config_flow::data::password%]"
         }
       }
     },
@@ -26,7 +25,8 @@
         "data": {
           "invert_binary_sensor": "Invert binary sensor state",
           "send_end_position_cover": "Set Cover End position after move",
-          "cover_closetime": "Time it takes for covers to close completely (0 to disable)"
+          "cover_closetime": "Time it takes for covers to close completely (0 to disable)",
+          "use_timed_covers": "Configure supported covers as timed covers"
         }
       }
     }

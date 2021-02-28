@@ -52,8 +52,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                     d.name.endswith(" op")
                     or d.name.endswith(" open")
                     or (
-                        config_entry.data.get(CONF_COVER_USE_TIMED) is not None
-                        and not config_entry.data.get(CONF_COVER_USE_TIMED)
+                        config_entry.options.get(CONF_COVER_USE_TIMED) is not None
+                        and not config_entry.options.get(CONF_COVER_USE_TIMED)
                     )
                 ):
                     entities.append(HADobissCover(d, d.buddy, config_entry))
