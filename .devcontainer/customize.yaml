@@ -1,0 +1,15 @@
+cover.bureel:
+  travelling_time_up: 30
+  travelling_time_down: 27
+cover.bibliotheek:
+  travelling_time_up: 51
+  travelling_time_down: 45
+cover.dressing:
+  travelling_time_up: 29
+  travelling_time_down: 28
+cover.slk_ouders:
+  travelling_time_up: 43
+  travelling_time_down: 40
+cover.duplex:
+  travelling_time_up: 36
+  travelling_time_down: 32

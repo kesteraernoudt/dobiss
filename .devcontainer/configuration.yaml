@@ -1,5 +1,5 @@
 homeassistant:
-  #customize: !include customize.yaml
+  customize: !include customize.yaml
 
 default_config:
 
