@@ -266,6 +266,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         self.tc = TravelCalculator(self._travel_time_down, self._travel_time_up)
         self._external_signal = False
         self._last_up = False
+        self._last_config_check = None
 
     @property
     def device_info(self):
@@ -296,7 +297,19 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         return attr
 
     def check_times_changed(self):
+        from datetime import datetime
+
+        CONFIG_CHECK_INTERVAL = 30.0
         """check if we need to modify the TC."""
+        if self._last_config_check is not None:
+            difference = (datetime.now() - self._last_config_check).total_seconds()
+            if difference < CONFIG_CHECK_INTERVAL:
+                _LOGGER.warn("Skipping config check!")
+                return
+        _LOGGER.warn(
+            "-------------------------- Doing config check! ------------------------------------"
+        )
+        self._last_config_check = datetime.now()
         state = self.hass.states.get(self.entity_id)
         if (
             state is not None
