@@ -304,9 +304,9 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         if self._last_config_check is not None:
             difference = (datetime.now() - self._last_config_check).total_seconds()
             if difference < CONFIG_CHECK_INTERVAL:
-                _LOGGER.warn("Skipping config check!")
+                _LOGGER.debug("Skipping config check!")
                 return
-        _LOGGER.warn(
+        _LOGGER.debug(
             "-------------------------- Doing config check! ------------------------------------"
         )
         self._last_config_check = datetime.now()
