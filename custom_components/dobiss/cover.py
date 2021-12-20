@@ -25,6 +25,7 @@ from homeassistant.util import dt as dt_util
 from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_COVER_USE_TIMED
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_TRAVELLING_TIME_DOWN
 from .const import CONF_TRAVELLING_TIME_UP
 from .const import DEFAULT_COVER_TRAVELTIME
@@ -44,6 +45,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     d_entities = dobiss.get_devices_by_type(DobissSwitch)
     entities = []
     for d in d_entities:
+        if (
+            config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
+            and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
+            and (d.address == 210 or d.address == 211)
+        ):
+            continue
         if d.buddy:
             # only add the up cover, and his buddy is down
             if d.icons_id == DOBISS_UP:

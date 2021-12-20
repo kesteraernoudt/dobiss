@@ -7,6 +7,7 @@ from dobissapi import (
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR
 
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import DOMAIN
 from .const import KEY_API
@@ -24,6 +25,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entities = []
     d_entities = dobiss.get_devices_by_type(DobissBinarySensor)
     for d in d_entities:
+        if (
+            config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
+            and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
+            and (d.address == 210 or d.address == 211)
+        ):
+            continue
         # _LOGGER.warn("set up dobiss binary sensor on {}".format(dobiss.host))
         entities.append(HADobissBinarySensor(d, config_entry))
 

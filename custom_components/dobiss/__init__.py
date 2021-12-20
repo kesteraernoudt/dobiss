@@ -16,10 +16,12 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_COVER_USE_TIMED
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_COVER_USE_TIMED
+from .const import DEFAULT_IGNORE_ZIGBEE_DEVICES
 from .const import DEFAULT_INVERT_BINARY_SENSOR
 from .const import DEVICES
 from .const import DOMAIN
@@ -243,6 +245,8 @@ class HADobiss:
         )
         if CONF_INVERT_BINARY_SENSOR not in options:
             options[CONF_INVERT_BINARY_SENSOR] = DEFAULT_INVERT_BINARY_SENSOR
+        if CONF_IGNORE_ZIGBEE_DEVICES not in options:
+            options[CONF_IGNORE_ZIGBEE_DEVICES] = DEFAULT_IGNORE_ZIGBEE_DEVICES
         if CONF_COVER_SET_END_POSITION not in options:
             options[CONF_COVER_SET_END_POSITION] = DEFAULT_COVER_SET_END_POSITION
         if CONF_COVER_CLOSETIME not in options:

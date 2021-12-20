@@ -7,6 +7,7 @@ from dobissapi import (
 from homeassistant.components.number import NumberEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import DOMAIN
 from .const import KEY_API
 
@@ -26,6 +27,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entities = []
     d_entities = dobiss.get_devices_by_type(DobissTempSensor)
     for d in d_entities:
+        if (
+            config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
+            and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
+            and (d.address == 210 or d.address == 211)
+        ):
+            continue
         entities.append(HADobissNumber(d))
     if entities:
         async_add_entities(entities)

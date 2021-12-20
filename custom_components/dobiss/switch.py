@@ -9,6 +9,7 @@ from homeassistant.const import ENTITY_MATCH_ALL
 from homeassistant.const import ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import DOMAIN
 from .const import KEY_API
 
@@ -25,6 +26,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     d_entities = dobiss.get_devices_by_type(DobissSwitch)
     entities = []
     for d in d_entities:
+        if (
+            config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
+            and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
+            and (d.address == 210 or d.address == 211)
+        ):
+            continue
         # _LOGGER.warn(f"set up dobiss switch {d.name} on {dobiss.host}")
         if not d.buddy:
             entities.append(HADobissSwitch(d))

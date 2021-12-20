@@ -24,6 +24,7 @@
       "init": {
         "data": {
           "invert_binary_sensor": "Invert binary sensor state",
+          "ignore_zigbee_devices": "Ignore Zigbee devices",
           "send_end_position_cover": "Set Cover End position after move",
           "cover_closetime": "Time it takes for covers to close completely (0 to disable)",
           "use_timed_covers": "Configure supported covers as timed covers"

@@ -12,6 +12,7 @@ from homeassistant.const import ENTITY_MATCH_ALL
 from homeassistant.const import ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import DOMAIN
 from .const import KEY_API
 
@@ -29,6 +30,12 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     light_entities = dobiss.get_devices_by_type(DobissLight)
     entities = []
     for d in light_entities:
+        if (
+            config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
+            and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
+            and (d.address == 210 or d.address == 211)
+        ):
+            continue
         # _LOGGER.warn("set up dobiss lights on {}".format(dobiss.url))
         entities.append(HADobissLight(d))
     # wrap analog output in lights for now...

@@ -13,12 +13,14 @@ from homeassistant.core import callback
 from .const import CONF_COVER_CLOSETIME
 from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_COVER_USE_TIMED
+from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import CONF_SECRET
 from .const import CONF_SECURE
 from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_COVER_USE_TIMED
+from .const import DEFAULT_IGNORE_ZIGBEE_DEVICES
 from .const import DEFAULT_INVERT_BINARY_SENSOR
 from .const import DOMAIN
 
@@ -136,6 +138,12 @@ class DobissOptionsFlowHandler(config_entries.OptionsFlow):
                     CONF_INVERT_BINARY_SENSOR,
                     default=self.config_entry.options.get(
                         CONF_INVERT_BINARY_SENSOR, DEFAULT_INVERT_BINARY_SENSOR
+                    ),
+                ): cv.boolean,
+                vol.Required(
+                    CONF_IGNORE_ZIGBEE_DEVICES,
+                    default=self.config_entry.options.get(
+                        CONF_IGNORE_ZIGBEE_DEVICES, DEFAULT_IGNORE_ZIGBEE_DEVICES
                     ),
                 ): cv.boolean,
                 vol.Required(

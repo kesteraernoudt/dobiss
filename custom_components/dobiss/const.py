@@ -21,3 +21,6 @@ DEFAULT_COVER_TRAVELTIME = 55
 
 CONF_TRAVELLING_TIME_DOWN = "travelling_time_down"
 CONF_TRAVELLING_TIME_UP = "travelling_time_up"
+
+CONF_IGNORE_ZIGBEE_DEVICES = "ignore_zigbee_devices"
+DEFAULT_IGNORE_ZIGBEE_DEVICES = False
