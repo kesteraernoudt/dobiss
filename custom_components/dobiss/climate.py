@@ -105,7 +105,7 @@ class HADobissClimateControl(ClimateEntity):
         }
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return supported attributes."""
         return self._dobisssensor.attributes
 

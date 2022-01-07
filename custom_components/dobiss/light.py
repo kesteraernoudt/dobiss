@@ -67,7 +67,7 @@ class HADobissLight(LightEntity):
         }
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return supported attributes."""
         return self._dobisslight.attributes
 

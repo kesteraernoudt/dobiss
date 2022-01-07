@@ -117,7 +117,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
         return self._device_class
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return supported attributes."""
         prefix = "up_"
         attr = {prefix + str(key): val for key, val in self._up.attributes.items()}
@@ -290,7 +290,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         return self._device_class
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return supported attributes."""
         prefix = "up_"
         attr = {prefix + str(key): val for key, val in self._up.attributes.items()}
