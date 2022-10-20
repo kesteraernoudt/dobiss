@@ -62,6 +62,7 @@ custom_components/dobiss/light.py
 ## Debugging
 
 To get more debug info in the log, add this to your configuration.yaml file:
+
 ```
 logger:
   logs:
