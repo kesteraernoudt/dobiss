@@ -59,6 +59,16 @@ custom_components/dobiss/light.py
 
 ## Configuration is done in the UI
 
+## Debugging
+
+To get more debug info in the log, add this to your configuration.yaml file:
+```
+logger:
+  logs:
+    custom_components.dobiss: debug
+    dobissapi.dobissapi: debug
+```
+
 ## Dependencies
 
 This integration will use the [pydobiss] python library which uses the native [Dobiss NXT API][dobiss_api].
