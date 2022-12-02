@@ -43,9 +43,9 @@ class HADobissNumber(NumberEntity, RestoreEntity):
 
     should_poll = False
 
-    min_value = -30
+    native_min_value = -30
 
-    max_value = 60 * 24
+    native_max_value = 60 * 24
 
     step = 15
 
