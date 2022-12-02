@@ -47,7 +47,7 @@ class HADobissNumber(NumberEntity, RestoreEntity):
 
     native_max_value = 60 * 24
 
-    step = 15
+    native_step = 15
 
     def __init__(self, dobisssensor: DobissTempSensor):
         """Init dobiss Number device."""
