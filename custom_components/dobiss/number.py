@@ -88,10 +88,10 @@ class HADobissNumber(NumberEntity, RestoreEntity):
         return f"default_time_{self._dobisssensor.object_id}"
 
     @property
-    def value(self) -> float:
+    def native_value(self) -> float:
         """Return the entity value to represent the entity state."""
         return float(self._dobisssensor.default_time)
 
-    async def async_set_value(self, value: float):
+    async def async_set_native_value(self, value: float):
         """Set new value."""
         await self._dobisssensor.set_default_time(round(value))
