@@ -71,7 +71,7 @@ class HADobissNumber(NumberEntity, RestoreEntity):
         self._dobisssensor.register_callback(self.async_write_ha_state)
         last_state = await self.async_get_last_state()
         if last_state:
-            await self.async_set_value(float(last_state.state))
+            await self.async_set_native_value(float(last_state.state))
 
     async def async_will_remove_from_hass(self):
         """Entity being removed from hass."""
