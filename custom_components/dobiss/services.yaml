@@ -16,6 +16,9 @@ turn_on:
     delayoff:
       description: Optional, number of seconds to wait before turning the entity off again (more than 120 seconds is rounded to max 120 minutes)
       example: 60
+    from_pir:
+      description: Optional, if this is triggered from a motion detector. This will restart the timer in dobiss
+      example: True
 
 set_hvac_temp_timer:
   description: Set the temperature and time to stay in manual mode for a specific zone

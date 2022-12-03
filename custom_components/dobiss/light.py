@@ -97,9 +97,11 @@ class HADobissLight(LightEntity):
             }
             await getattr(self, data["method"])(**params)
 
-    async def turn_on_service(self, brightness=None, delayon=None, delayoff=None):
+    async def turn_on_service(
+        self, brightness=None, delayon=None, delayoff=None, from_pir=False
+    ):
         await self._dobisslight.turn_on(
-            brightness=brightness, delayon=delayon, delayoff=delayoff
+            brightness=brightness, delayon=delayon, delayoff=delayoff, from_pir=from_pir
         )
 
     @property
