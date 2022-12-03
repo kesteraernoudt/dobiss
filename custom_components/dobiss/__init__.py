@@ -10,6 +10,7 @@ from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.config_validation import entity_ids
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
@@ -43,6 +44,7 @@ ATTR_OPTION1 = "option1"
 ATTR_OPTION2 = "option2"
 ATTR_DELAYON = "delayon"
 ATTR_DELAYOFF = "delayoff"
+ATTR_FROMPIR = "from_pir"
 
 ACTION_REQUEST_SCHEMA = vol.Schema(
     vol.All(
@@ -70,6 +72,7 @@ TURN_ON_SCHEMA = vol.Schema(
             vol.Optional(ATTR_BRIGHTNESS): vol.Coerce(int),
             vol.Optional(ATTR_DELAYON): vol.Coerce(int),
             vol.Optional(ATTR_DELAYOFF): vol.Coerce(int),
+            vol.Optional(ATTR_FROMPIR): cv.bool,
         }
     )
 )
