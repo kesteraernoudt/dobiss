@@ -72,7 +72,7 @@ TURN_ON_SCHEMA = vol.Schema(
             vol.Optional(ATTR_BRIGHTNESS): vol.Coerce(int),
             vol.Optional(ATTR_DELAYON): vol.Coerce(int),
             vol.Optional(ATTR_DELAYOFF): vol.Coerce(int),
-            vol.Optional(ATTR_FROMPIR): cv.bool,
+            vol.Optional(ATTR_FROMPIR): cv.boolean,
         }
     )
 )
