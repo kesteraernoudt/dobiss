@@ -8,7 +8,7 @@
   "homekit": {},
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/kesteraernoudt/dobiss/issues",
-  "requirements": ["pydobiss==0.1.50", "xknx==0.9.4"],
+  "requirements": ["pydobiss==0.1.51", "xknx==0.9.4"],
   "ssdp": [],
   "version": "1.0.0",
   "zeroconf": []
