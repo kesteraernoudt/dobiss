@@ -17,11 +17,13 @@ from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_INVERT_BINARY_SENSOR
 from .const import CONF_SECRET
 from .const import CONF_SECURE
+from .const import CONF_WEBSOCKET_TIMEOUT
 from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_COVER_USE_TIMED
 from .const import DEFAULT_IGNORE_ZIGBEE_DEVICES
 from .const import DEFAULT_INVERT_BINARY_SENSOR
+from .const import DEFAULT_WEBSOCKET_TIMEOUT
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -158,6 +160,12 @@ class DobissOptionsFlowHandler(config_entries.OptionsFlow):
                         CONF_COVER_USE_TIMED, DEFAULT_COVER_USE_TIMED
                     ),
                 ): cv.boolean,
+                vol.Required(
+                    CONF_WEBSOCKET_TIMEOUT,
+                    default=self.config_entry.options.get(
+                        CONF_WEBSOCKET_TIMEOUT, DEFAULT_WEBSOCKET_TIMEOUT
+                    ),
+                ): cv.positive_int,
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)

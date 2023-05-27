@@ -6,6 +6,7 @@ import voluptuous as vol
 from dobissapi import DobissAPI
 from homeassistant.components.light import ATTR_BRIGHTNESS
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
@@ -19,11 +20,13 @@ from .const import CONF_COVER_SET_END_POSITION
 from .const import CONF_COVER_USE_TIMED
 from .const import CONF_IGNORE_ZIGBEE_DEVICES
 from .const import CONF_INVERT_BINARY_SENSOR
+from .const import CONF_WEBSOCKET_TIMEOUT
 from .const import DEFAULT_COVER_CLOSETIME
 from .const import DEFAULT_COVER_SET_END_POSITION
 from .const import DEFAULT_COVER_USE_TIMED
 from .const import DEFAULT_IGNORE_ZIGBEE_DEVICES
 from .const import DEFAULT_INVERT_BINARY_SENSOR
+from .const import DEFAULT_WEBSOCKET_TIMEOUT
 from .const import DEVICES
 from .const import DOMAIN
 from .const import KEY_API
@@ -91,19 +94,22 @@ async def async_setup(hass: HomeAssistant, config: dict):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up dobiss from a config entry."""
 
+    _LOGGER.debug("async_setup_entry")
     client = HADobiss(hass, entry)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {KEY_API: client}
 
     if not await client.async_setup():
+        _LOGGER.warning("Dobiss setup failed")
         return False
 
-    entry.add_update_listener(async_reload_entry)
+    # entry.add_update_listener(async_reload_entry)
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
+    _LOGGER.debug("async_unload_entry")
     if hass.data[DOMAIN][entry.entry_id][KEY_API].unsub:
         hass.data[DOMAIN][entry.entry_id][KEY_API].unsub()
     unload_ok = all(
@@ -116,6 +122,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+    else:
+        _LOGGER.warning("Unload failed")
 
     return unload_ok
 
@@ -149,6 +157,16 @@ class HADobiss:
                 self.config_entry.data["host"],
                 self.config_entry.data["secure"],
             )
+            websocket_timeout = self.config_entry.options.get(
+                CONF_WEBSOCKET_TIMEOUT, DEFAULT_WEBSOCKET_TIMEOUT
+            )
+            _LOGGER.debug(
+                f"(async_setup) Setting websocket timeout to {websocket_timeout}"
+            )
+            if websocket_timeout == 0:
+                self.api.websocket_timeout = None
+            else:
+                self.api.websocket_timeout = websocket_timeout
             devices = self.api.get_all_devices()
             self.hass.data[DOMAIN][self.config_entry.entry_id][DEVICES] = devices
 
@@ -256,11 +274,23 @@ class HADobiss:
             options[CONF_COVER_CLOSETIME] = DEFAULT_COVER_CLOSETIME
         if CONF_COVER_USE_TIMED not in options:
             options[CONF_COVER_USE_TIMED] = DEFAULT_COVER_USE_TIMED
+        if CONF_WEBSOCKET_TIMEOUT not in options:
+            options[CONF_WEBSOCKET_TIMEOUT] = DEFAULT_WEBSOCKET_TIMEOUT
 
         self.hass.config_entries.async_update_entry(self.config_entry, options=options)
 
     @staticmethod
     async def update_listener(hass, entry):
         """Handle options update."""
-        dobiss = hass.data[DOMAIN][entry.entry_id][KEY_API].api
-        await dobiss.update_all(force=True)
+        # dobiss = hass.data[DOMAIN][entry.entry_id][KEY_API].api
+        # websocket_timeout = entry.options.get(CONF_WEBSOCKET_TIMEOUT, DEFAULT_WEBSOCKET_TIMEOUT)
+        # _LOGGER.debug(f"(update_listener) Setting websocket timeout to {websocket_timeout}")
+        # if websocket_timeout == 0:
+        #    dobiss.websocket_timeout = None
+        # else:
+        #    dobiss.websocket_timeout = websocket_timeout
+        # await dobiss.update_all(force=True)
+
+        if entry.source == SOURCE_IMPORT:
+            return
+        await hass.config_entries.async_reload(entry.entry_id)
