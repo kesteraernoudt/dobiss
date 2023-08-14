@@ -1,55 +1,46 @@
 force_update:
-  description: Force all entities to update their status
 
 turn_on:
   description: Turn a dobiss output on, with optional delay in on or off
   fields:
     entity_id:
-      description: Mandatory, the entity id to turn on
+      required: true
       example: light.bureel
     brightness:
-      description: Optional, if it's a dimmable object, the brightness
+      advanced: true
       example: 25
     delayon:
-      description: Optional, number of seconds to wait before actually turning on (more than 120 seconds is rounded to max 120 minutes)
       example: 10
     delayoff:
-      description: Optional, number of seconds to wait before turning the entity off again (more than 120 seconds is rounded to max 120 minutes)
       example: 60
     from_pir:
-      description: Optional, if this is triggered from a motion detector. This will restart the timer in dobiss
+      advanced: true
       example: True
 
 set_hvac_temp_timer:
-  description: Set the temperature and time to stay in manual mode for a specific zone
   fields:
     entity_id:
-      description: Which zone to set the timer for
       example: climate.binnen
     time:
-      description: Optional, How long should this zone stay in manual mode, in minutes. Default 30 minutes
       example: 90
     temperature:
-      description: Optional, What target temperature to set this zone to. Default current target temperature
       example: 22.5
 
 action_request:
   description: Sends an action request to the dobiss NXT server
   fields:
     address:
-      description: "VERPLICHT, adres van de module of het NXT actie adres (>200)"
+      required: true
       example: 1
     channel:
-      description: VERPLICHT, module uitgang (start bij 0) of NXT uitgang nummer (start op 1),
+      required: true
       example: 1
     action:
-      description: VERPLICHT, actie id (0 = uit, 1 = aan, 2 = schakelen) // zie lijst van acties
+      required: true
       example: 2
     option1:
-      description: "dimmer: waarde (0-100) / audio: volume (0-100) / temperatuur: stel temperatuur in of kalender"
       example: 50
     option2:
-      description: "dimmer: soft start/stop (0-254) / audio: bron / temperatuur: periode"
       example: 50
 
 # from the Dobiss API info
@@ -78,13 +69,10 @@ action_request:
 #}
 
 status_request:
-  description: Sends a status request to the dobiss NXT server
   fields:
     address:
-      description: OPTIONEEL, adres van de module of het NXT actie adres (>200)
       example: 1
     channel:
-      description: OPTIONEEL, module uitgang (start bij 0) of NXT uitgang nummer (start op 1)
       example: 1
 # from the Dobiss API info
 #{
