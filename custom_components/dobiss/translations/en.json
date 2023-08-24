@@ -33,5 +33,95 @@
         }
       }
     }
+  },
+  "services": {
+    "force_update": {
+      "name": "Force update",
+      "description": "Force all entities to update their status"
+    },
+    "turn_on": {
+      "name": "Turn on",
+      "description": "Turn a dobiss output on, with optional delay in on or off",
+      "fields": {
+        "entity_id": {
+          "name": "entity id",
+          "description": "the entity id to turn on"
+        },
+        "brightness": {
+          "name": "brightness",
+          "description": "if it's a dimmable object, the brightness"
+        },
+        "delayon": {
+          "name": "delay on",
+          "description": "number of seconds to wait before actually turning on (more than 120 seconds is rounded to max 120 minutes)"
+        },
+        "delayoff": {
+          "name": "delay off",
+          "description": "number of seconds to wait before turning the entity off again (more than 120 seconds is rounded to max 120 minutes)"
+        },
+        "from_pir": {
+          "name": "from pir",
+          "description": "if this is triggered from a motion detector. This will restart the timer in dobiss"
+        }
+      }
+    },
+    "set_hvac_temp_timer": {
+      "name": "set hvac temp timer",
+      "description": "Set the temperature and time to stay in manual mode for a specific zone",
+      "fields": {
+        "entity_id": {
+          "name": "entity id",
+          "description": "Which zone to set the timer for"
+        },
+        "time": {
+          "name": "time",
+          "description": "How long should this zone stay in manual mode, in minutes. Default 30 minutes"
+        },
+        "temperature": {
+          "name": "temperature",
+          "description": "What target temperature to set this zone to. Default current target temperature"
+        }
+      }
+    },
+    "action_request": {
+      "name": "send action request",
+      "description": "Sends an action request to the dobiss NXT server",
+      "fields": {
+        "address": {
+          "name": "address",
+          "description": "adres van de module of het NXT actie adres (>200)"
+        },
+        "channel": {
+          "name": "channel",
+          "description": "module uitgang (start bij 0) of NXT uitgang nummer (start op 1)"
+        },
+        "action": {
+          "name": "action",
+          "description": "actie id (0 = uit, 1 = aan, 2 = schakelen) // zie lijst van acties"
+        },
+        "option1": {
+          "name": "option1",
+          "description": "dimmer: waarde (0-100) / audio: volume (0-100) / temperatuur: stel temperatuur in of kalender"
+        },
+        "option2": {
+          "name": "option2",
+          "description": "dimmer: soft start/stop (0-254) / audio: bron / temperatuur: periode"
+        }
+      }
+    },
+    "status_request": {
+      "name": "status request",
+      "description": "Sends a status request to the dobiss NXT server",
+      "fields": {
+        "address": {
+          "name": "address",
+          "description": "adres van de module of het NXT actie adres (>200)"
+        },
+        "channel": {
+          "name": "channel",
+          "description": "module uitgang (start bij 0) of NXT uitgang nummer (start op 1)"
+        }
+      }
+    }
   }
 }
