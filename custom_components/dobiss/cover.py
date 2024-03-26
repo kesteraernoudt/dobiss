@@ -1,6 +1,7 @@
 """Support for dobiss covers."""
 import logging
 from asyncio import wait
+from asyncio import create_task
 from datetime import timedelta
 
 from dobissapi import DOBISS_UP
@@ -243,9 +244,9 @@ class HADobissCover(CoverEntity, RestoreEntity):
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
         if self._is_velux:
-            await wait([self._up.turn_on(), self._down.turn_on()])
+            await wait([create_task(self._up.turn_on()), create_task(self._down.turn_on())])
         else:
-            await wait([self._up.turn_off(), self._down.turn_off()])
+            await wait([create_task(self._up.turn_off()), create_task(self._down.turn_off())])
 
 
 class HADobissCoverPosition(CoverEntity, RestoreEntity):
