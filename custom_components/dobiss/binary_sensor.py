@@ -1,16 +1,16 @@
-"""Support for dobiss switchs."""
+"""Support for dobiss switches."""
 import logging
 
-from dobissapi import (
-    DobissBinarySensor,
-)
-from homeassistant.components.binary_sensor import BinarySensorEntity
-from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR
+from dobissapi import DobissBinarySensor
 
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import CONF_INVERT_BINARY_SENSOR
-from .const import DOMAIN
-from .const import KEY_API
+from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR, BinarySensorEntity
+
+from .const import (
+    CONF_IGNORE_ZIGBEE_DEVICES,
+    CONF_INVERT_BINARY_SENSOR,
+    DOMAIN,
+    KEY_API,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         # _LOGGER.warn("set up dobiss binary sensor on {}".format(dobiss.host))

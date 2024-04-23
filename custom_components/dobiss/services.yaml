@@ -15,7 +15,7 @@ turn_on:
       example: 60
     from_pir:
       advanced: true
-      example: True
+      example: true
 
 set_hvac_temp_timer:
   fields:
@@ -45,12 +45,12 @@ action_request:
 
 # from the Dobiss API info
 # blijkbaar is voor temp, option1 = (target-5)*10
-#{
-#     "address"   : VERPLICHT, adres van de module of het NXT actie adres (>200),
+# {
+#     "address"   : VERPLICHT, address van de module of het NXT actie address (>200),
 #     "channel"   : VERPLICHT, module uitgang (start bij 0) of NXT uitgang nummer (start op 1),
 #     "action"    : VERPLICHT, actie id (0 = uit, 1 = aan, 2 = schakelen) // zie lijst van acties
 #     "option1"   : dimmer: waarde (0-100) / audio: volume (0-100) / temperatuur: stel temperatuur in of kalender
-#     "option2"   : dimmer: soft start/stop (0-254) / audio: bron / temperatuur: periode
+#     "option2"   : dimmer: soft start/stop (0-254) / audio: bron / temperatuur: period
 #     "delayon"   :
 #     	{
 #     	   "value" : 0-120,
@@ -66,7 +66,7 @@ action_request:
 #           "id"    : ID van de logische conditie die nagekeken moet worden voor de uitvoering,
 #           "operator": 'true' or 'false'
 #     }
-#}
+# }
 
 status_request:
   fields:
@@ -75,7 +75,7 @@ status_request:
     channel:
       example: 1
 # from the Dobiss API info
-#{
-#     "address"   : OPTIONEEL, adres van de module of het NXT actie adres (>200),
+# {
+#     "address"   : OPTIONEEL, address van de module of het NXT actie address (>200),
 #     "channel"   : OPTIONEEL, module uitgang (start bij 0) of NXT uitgang nummer (start op 1)
-#}
+# }

@@ -1,26 +1,29 @@
 """Support for dobiss climate control."""
 import logging
 
+from dobissapi import DobissTempSensor
 import voluptuous as vol
-from dobissapi import (
-    DobissTempSensor,
+
+from homeassistant.components.climate import (
+    HVAC_MODE_HEAT,
+    SUPPORT_PRESET_MODE,
+    SUPPORT_TARGET_TEMPERATURE,
+    ClimateEntity,
 )
-from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate import HVAC_MODE_HEAT
-from homeassistant.components.climate import SUPPORT_PRESET_MODE
-from homeassistant.components.climate import SUPPORT_TARGET_TEMPERATURE
-from homeassistant.components.climate.const import CURRENT_HVAC_HEAT
-from homeassistant.components.climate.const import CURRENT_HVAC_IDLE
-from homeassistant.components.climate.const import HVAC_MODE_AUTO
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.const import ATTR_TEMPERATURE
-from homeassistant.const import ATTR_TIME
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.components.climate.const import (
+    CURRENT_HVAC_HEAT,
+    CURRENT_HVAC_IDLE,
+    HVAC_MODE_AUTO,
+)
+from homeassistant.const import (
+    ATTR_ENTITY_ID,
+    ATTR_TEMPERATURE,
+    ATTR_TIME,
+    TEMP_CELSIUS,
+)
 from homeassistant.helpers.config_validation import entity_id
 
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import DOMAIN
-from .const import KEY_API
+from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +56,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         entities.append(HADobissClimateControl(d))

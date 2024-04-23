@@ -1,37 +1,42 @@
 """Support for dobiss covers."""
-import logging
-from asyncio import wait
-from asyncio import create_task
+from asyncio import create_task, wait
 from datetime import timedelta
+import logging
 
-from dobissapi import DOBISS_UP
-from dobissapi import DobissSwitch
-from homeassistant.components.cover import ATTR_CURRENT_POSITION
-from homeassistant.components.cover import ATTR_POSITION
-from homeassistant.components.cover import CoverEntity
-from homeassistant.components.cover import DEVICE_CLASS_SHADE
-from homeassistant.components.cover import DEVICE_CLASS_WINDOW
-from homeassistant.components.cover import SUPPORT_CLOSE
-from homeassistant.components.cover import SUPPORT_OPEN
-from homeassistant.components.cover import SUPPORT_SET_POSITION
-from homeassistant.components.cover import SUPPORT_STOP
-from homeassistant.const import SERVICE_CLOSE_COVER
-from homeassistant.const import SERVICE_OPEN_COVER
-from homeassistant.const import SERVICE_STOP_COVER
+from dobissapi import DOBISS_UP, DobissSwitch
+
+from homeassistant.components.cover import (
+    ATTR_CURRENT_POSITION,
+    ATTR_POSITION,
+    DEVICE_CLASS_SHADE,
+    DEVICE_CLASS_WINDOW,
+    SUPPORT_CLOSE,
+    SUPPORT_OPEN,
+    SUPPORT_SET_POSITION,
+    SUPPORT_STOP,
+    CoverEntity,
+)
+from homeassistant.const import (
+    SERVICE_CLOSE_COVER,
+    SERVICE_OPEN_COVER,
+    SERVICE_STOP_COVER,
+)
 from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import dt as dt_util
 
-from .const import CONF_COVER_CLOSETIME
-from .const import CONF_COVER_SET_END_POSITION
-from .const import CONF_COVER_USE_TIMED
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import CONF_TRAVELLING_TIME_DOWN
-from .const import CONF_TRAVELLING_TIME_UP
-from .const import DEFAULT_COVER_TRAVELTIME
-from .const import DOMAIN
-from .const import KEY_API
+from .const import (
+    CONF_COVER_CLOSETIME,
+    CONF_COVER_SET_END_POSITION,
+    CONF_COVER_USE_TIMED,
+    CONF_IGNORE_ZIGBEE_DEVICES,
+    CONF_TRAVELLING_TIME_DOWN,
+    CONF_TRAVELLING_TIME_UP,
+    DEFAULT_COVER_TRAVELTIME,
+    DOMAIN,
+    KEY_API,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,7 +54,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         if d.buddy:
@@ -244,9 +249,13 @@ class HADobissCover(CoverEntity, RestoreEntity):
     async def async_stop_cover(self, **kwargs):
         """Stop the cover."""
         if self._is_velux:
-            await wait([create_task(self._up.turn_on()), create_task(self._down.turn_on())])
+            await wait(
+                [create_task(self._up.turn_on()), create_task(self._down.turn_on())]
+            )
         else:
-            await wait([create_task(self._up.turn_off()), create_task(self._down.turn_off())])
+            await wait(
+                [create_task(self._up.turn_off()), create_task(self._down.turn_off())]
+            )
 
 
 class HADobissCoverPosition(CoverEntity, RestoreEntity):
@@ -492,7 +501,6 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
             self.tc.start_travel(position)
             _LOGGER.debug("set_position :: command %s", command)
             await self._async_handle_command(command)
-        return
 
     def start_auto_updater(self):
         """Start the autoupdater to update HASS while cover is moving."""

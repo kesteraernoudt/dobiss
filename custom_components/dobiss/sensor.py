@@ -1,17 +1,16 @@
-"""Support for dobiss switchs."""
+"""Support for dobiss switches."""
 import logging
 
-from dobissapi import DobissLightSensor
-from dobissapi import DobissSensor
-from dobissapi import DobissTempSensor
-from homeassistant.const import DEVICE_CLASS_ILLUMINANCE
-from homeassistant.const import DEVICE_CLASS_TEMPERATURE
-from homeassistant.const import TEMP_CELSIUS
+from dobissapi import DobissLightSensor, DobissSensor, DobissTempSensor
+
+from homeassistant.const import (
+    DEVICE_CLASS_ILLUMINANCE,
+    DEVICE_CLASS_TEMPERATURE,
+    TEMP_CELSIUS,
+)
 from homeassistant.helpers.entity import Entity
 
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import DOMAIN
-from .const import KEY_API
+from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +28,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         # _LOGGER.warn("set up dobiss temp sensor on {}".format(dobiss.host))

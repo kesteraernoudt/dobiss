@@ -1,17 +1,13 @@
-"""Support for dobiss switchs."""
+"""Support for dobiss switches."""
 import logging
 
-from dobissapi import DobissSwitch
-from dobissapi import ICON_FROM_DOBISS
+from dobissapi import ICON_FROM_DOBISS, DobissSwitch
+
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.const import ENTITY_MATCH_ALL
-from homeassistant.const import ENTITY_MATCH_NONE
+from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import DOMAIN
-from .const import KEY_API
+from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +25,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         # _LOGGER.warn(f"set up dobiss switch {d.name} on {dobiss.host}")
@@ -65,7 +61,7 @@ class HADobissSwitch(SwitchEntity):
 
     @property
     def icon(self):
-        """Return the icon to use in the frontend"""
+        """Return the icon to use in the frontend."""
         return ICON_FROM_DOBISS[self._dobissswitch.icons_id]
 
     async def async_added_to_hass(self):

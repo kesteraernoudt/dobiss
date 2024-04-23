@@ -1,20 +1,17 @@
 """Support for dobiss lights."""
 import logging
 
-from dobissapi import DobissAnalogOutput
-from dobissapi import DobissLight
-from dobissapi import DobissOutput
-from homeassistant.components.light import ATTR_BRIGHTNESS
-from homeassistant.components.light import LightEntity
-from homeassistant.components.light import SUPPORT_BRIGHTNESS
-from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.const import ENTITY_MATCH_ALL
-from homeassistant.const import ENTITY_MATCH_NONE
+from dobissapi import DobissAnalogOutput, DobissLight, DobissOutput
+
+from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
+    SUPPORT_BRIGHTNESS,
+    LightEntity,
+)
+from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import DOMAIN
-from .const import KEY_API
+from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +30,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if (
             config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES) is not None
             and config_entry.options.get(CONF_IGNORE_ZIGBEE_DEVICES)
-            and (d.address == 210 or d.address == 211)
+            and (d.address in (210, 211))
         ):
             continue
         # _LOGGER.warn("set up dobiss lights on {}".format(dobiss.url))
@@ -131,7 +128,7 @@ class HADobissLight(LightEntity):
 
     @property
     def icon(self):
-        """Return the icon to use in the frontend"""
+        """Return the icon to use in the frontend."""
         if isinstance(self._dobisslight, DobissAnalogOutput):
             return "mdi:hvac"
         return super().icon

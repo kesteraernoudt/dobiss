@@ -2,29 +2,30 @@
 import logging
 
 import dobissapi
-import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-from homeassistant import config_entries
-from homeassistant import core
-from homeassistant import exceptions
+
+from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
+import homeassistant.helpers.config_validation as cv
 
-from .const import CONF_COVER_CLOSETIME
-from .const import CONF_COVER_SET_END_POSITION
-from .const import CONF_COVER_USE_TIMED
-from .const import CONF_IGNORE_ZIGBEE_DEVICES
-from .const import CONF_INVERT_BINARY_SENSOR
-from .const import CONF_SECRET
-from .const import CONF_SECURE
-from .const import CONF_WEBSOCKET_TIMEOUT
-from .const import DEFAULT_COVER_CLOSETIME
-from .const import DEFAULT_COVER_SET_END_POSITION
-from .const import DEFAULT_COVER_USE_TIMED
-from .const import DEFAULT_IGNORE_ZIGBEE_DEVICES
-from .const import DEFAULT_INVERT_BINARY_SENSOR
-from .const import DEFAULT_WEBSOCKET_TIMEOUT
-from .const import DOMAIN
+from .const import (
+    CONF_COVER_CLOSETIME,
+    CONF_COVER_SET_END_POSITION,
+    CONF_COVER_USE_TIMED,
+    CONF_IGNORE_ZIGBEE_DEVICES,
+    CONF_INVERT_BINARY_SENSOR,
+    CONF_SECRET,
+    CONF_SECURE,
+    CONF_WEBSOCKET_TIMEOUT,
+    DEFAULT_COVER_CLOSETIME,
+    DEFAULT_COVER_SET_END_POSITION,
+    DEFAULT_COVER_USE_TIMED,
+    DEFAULT_IGNORE_ZIGBEE_DEVICES,
+    DEFAULT_INVERT_BINARY_SENSOR,
+    DEFAULT_WEBSOCKET_TIMEOUT,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ async def validate_input(hass: core.HomeAssistant, data):
     if not await hub.authenticate():
         raise InvalidAuth
 
-    return {"title": "NXT server {}".format(data[CONF_HOST])}
+    return {"title": f"NXT server {data[CONF_HOST]}"}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
