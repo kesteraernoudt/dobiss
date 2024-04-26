@@ -3,7 +3,7 @@ import logging
 
 from dobissapi import DobissBinarySensor
 
-from homeassistant.components.binary_sensor import DEVICE_CLASS_DOOR, BinarySensorEntity
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
 
 from .const import (
     CONF_IGNORE_ZIGBEE_DEVICES,
@@ -41,7 +41,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 class HADobissBinarySensor(BinarySensorEntity):
     """Dobiss Light Sensor."""
 
-    device_class = DEVICE_CLASS_DOOR
+    device_class = BinarySensorDeviceClass.DOOR
 
     should_poll = False
 
