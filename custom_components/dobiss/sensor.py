@@ -2,9 +2,9 @@
 import logging
 
 from dobissapi import DobissLightSensor, DobissSensor, DobissTempSensor
-
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import UnitOfTemperature
 from homeassistant.helpers.entity import Entity
-
 from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
 
 _LOGGER = logging.getLogger(__name__)
