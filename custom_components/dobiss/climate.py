@@ -4,16 +4,12 @@ import logging
 from dobissapi import DobissTempSensor
 import voluptuous as vol
 
-from homeassistant.components.climate import (
-    HVAC_MODE_HEAT,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
-    ClimateEntity,
-)
+from homeassistant.components.climate import ClimateEntity
+
 from homeassistant.components.climate.const import (
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    HVAC_MODE_AUTO,
+    ClimateEntityFeature,
+    HVACAction,
+    HVACMode,
 )
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -91,7 +87,7 @@ class HADobissClimateControl(ClimateEntity):
 
     temperature_unit = UnitOfTemperature.CELSIUS
 
-    supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
+    supported_features = ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
 
     def __init__(self, dobisssensor: DobissTempSensor):
         """Init dobiss ClimateControl device."""
@@ -155,7 +151,7 @@ class HADobissClimateControl(ClimateEntity):
         await self._dobisssensor.set_temperature(value)
 
     async def async_set_hvac_mode(self, hvac_mode: str):
-        await self._dobisssensor.set_manual_mode(hvac_mode == HVAC_MODE_HEAT)
+        await self._dobisssensor.set_manual_mode(hvac_mode == HVACMode.HEAT)
 
     async def async_set_preset_mode(self, preset_mode: str):
         await self._dobisssensor.set_preset_mode(preset_mode)
@@ -167,35 +163,34 @@ class HADobissClimateControl(ClimateEntity):
     @property
     def preset_mode(self):
         """Return the current preset mode, e.g., home, away, temp.
-        Requires SUPPORT_PRESET_MODE.
+        Requires ClimateEntityFeature.
         """
         return self._dobisssensor.calendar
 
     @property
     def hvac_mode(self):
         """Return hvac operation ie. heat, cool mode.
-        Need to be one of HVAC_MODE_*.
+        Need to be one of HVACMode.
         """
         if self._dobisssensor.time is not None and self._dobisssensor.time >= 0:
-            return HVAC_MODE_HEAT
-        return HVAC_MODE_AUTO
+            return HVACMode.HEAT
+        return HVACMode.AUTO
 
     @property
     def hvac_modes(self):
         """Return the list of available hvac operation modes.
-        Need to be a subset of HVAC_MODES.
+        Need to be a subset of HVACMode.
         """
         modes = []
-        modes.append(HVAC_MODE_HEAT)
-        modes.append(HVAC_MODE_AUTO)
+        modes.append(HVACMode.HEAT)
+        modes.append(HVACMode.AUTO)
         return modes
 
     @property
     def hvac_action(self):
         """Return the current running hvac operation if supported.
-
-        Need to be one of CURRENT_HVAC_*.
+        Need to be one of HVACAction.
         """
         if self._dobisssensor.status == 1:
-            return CURRENT_HVAC_HEAT
-        return CURRENT_HVAC_IDLE
+            return HVACAction.HEATING
+        return HVACAction.IDLE
