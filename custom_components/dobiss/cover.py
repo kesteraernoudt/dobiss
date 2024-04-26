@@ -8,13 +8,9 @@ from dobissapi import DOBISS_UP, DobissSwitch
 from homeassistant.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
-    DEVICE_CLASS_SHADE,
-    DEVICE_CLASS_WINDOW,
-    SUPPORT_CLOSE,
-    SUPPORT_OPEN,
-    SUPPORT_SET_POSITION,
-    SUPPORT_STOP,
     CoverEntity,
+    CoverDeviceClass,
+    CoverEntityFeature,
 )
 from homeassistant.const import (
     SERVICE_CLOSE_COVER,
@@ -81,7 +77,7 @@ class HADobissCover(CoverEntity, RestoreEntity):
 
     should_poll = False
 
-    supported_features = SUPPORT_STOP | SUPPORT_OPEN | SUPPORT_CLOSE
+    supported_features = CoverEntityFeature.STOP | CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE
 
     def __init__(self, up: DobissSwitch, down: DobissSwitch, config_entry):
         """Init dobiss Switch device."""
@@ -90,16 +86,16 @@ class HADobissCover(CoverEntity, RestoreEntity):
         # from dobiss: if it is a shade, up and down have the same name
         # if it is a velux shade, up and down end in 'op' and 'neer'
         # if it is a velux window, up and down end in 'open' and 'dicht'
-        self._device_class = DEVICE_CLASS_SHADE
+        self._device_class = CoverDeviceClass.SHADE
         self._is_velux = False
         self._name = up.name
         self._config_entry = config_entry
         if up.name.endswith(" op"):
-            self._device_class = DEVICE_CLASS_SHADE
+            self._device_class = CoverDeviceClass.SHADE
             self._name = up.name[: -len(" op")]
             self._is_velux = True
         elif up.name.endswith(" open"):
-            self._device_class = DEVICE_CLASS_WINDOW
+            self._device_class = CoverDeviceClass.WINDOW
             self._name = up.name[: -len(" open")]
             self._is_velux = True
         self._up = up
@@ -264,7 +260,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
     should_poll = False
 
     supported_features = (
-        SUPPORT_STOP | SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_SET_POSITION
+        CoverEntityFeature.STOP | CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.SET_POSITION
     )
 
     def __init__(self, up: DobissSwitch, down: DobissSwitch, config_entry):
@@ -272,7 +268,7 @@ class HADobissCoverPosition(CoverEntity, RestoreEntity):
         from xknx.devices import TravelCalculator
 
         super().__init__()
-        self._device_class = DEVICE_CLASS_SHADE
+        self._device_class = CoverDeviceClass.SHADE
         self._name = up.name
         self._config_entry = config_entry
         self._up = up
