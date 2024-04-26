@@ -19,7 +19,7 @@ from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_TEMPERATURE,
     ATTR_TIME,
-    TEMP_CELSIUS,
+    UnitOfTemperature,
 )
 from homeassistant.helpers.config_validation import entity_id
 
@@ -89,7 +89,7 @@ class HADobissClimateControl(ClimateEntity):
 
     should_poll = False
 
-    temperature_unit = TEMP_CELSIUS
+    temperature_unit = UnitOfTemperature.CELSIUS
 
     supported_features = SUPPORT_TARGET_TEMPERATURE | SUPPORT_PRESET_MODE
 
