@@ -3,11 +3,6 @@ import logging
 
 from dobissapi import DobissLightSensor, DobissSensor, DobissTempSensor
 
-from homeassistant.const import (
-    DEVICE_CLASS_ILLUMINANCE,
-    DEVICE_CLASS_TEMPERATURE,
-    TEMP_CELSIUS,
-)
 from homeassistant.helpers.entity import Entity
 
 from .const import CONF_IGNORE_ZIGBEE_DEVICES, DOMAIN, KEY_API
@@ -98,7 +93,7 @@ class HADobissSensor(Entity):
 class HADobissLightSensor(HADobissSensor):
     """Dobiss Light Sensor."""
 
-    device_class = DEVICE_CLASS_ILLUMINANCE
+    device_class = SensorDeviceClass.ILLUMINANCE
 
     @property
     def unit_of_measurement(self):
@@ -114,12 +109,12 @@ class HADobissLightSensor(HADobissSensor):
 class HADobissTempSensor(HADobissSensor):
     """Dobiss Light Sensor."""
 
-    device_class = DEVICE_CLASS_TEMPERATURE
+    device_class = SensorDeviceClass.TEMPERATURE
 
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def state(self):
