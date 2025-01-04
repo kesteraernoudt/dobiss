@@ -6,7 +6,6 @@ from dobissapi import DobissAnalogOutput, DobissLight, DobissOutput
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     LightEntity,
-    LightEntityFeature,
     ColorMode, 
 )
 from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, ENTITY_MATCH_NONE
