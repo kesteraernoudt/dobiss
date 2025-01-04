@@ -5,8 +5,8 @@ from dobissapi import DobissAnalogOutput, DobissLight, DobissOutput
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    SUPPORT_BRIGHTNESS,
     LightEntity,
+    LightEntityFeature,
 )
 from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -134,12 +134,21 @@ class HADobissLight(LightEntity):
         return super().icon
 
     @property
-    def supported_features(self):
+    def color_mode(self):
         """Flag supported features."""
         supports = 0
         if self._dobisslight.dimmable:
-            supports = SUPPORT_BRIGHTNESS
+            supports = LightEntityFeature.ColorMode.BRIGHTNESS
         return supports
+
+    @property
+    def supported_color_modes(self):
+        """Flag supported features."""
+        supports = 0
+        if self._dobisslight.dimmable:
+            supports = LightEntityFeature.ColorMode.BRIGHTNESS
+        return supports
+
 
     @property
     def name(self):

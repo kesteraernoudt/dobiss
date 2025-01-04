@@ -7,6 +7,8 @@ import voluptuous as vol
 from homeassistant import config_entries, core, exceptions
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
+from homeassistant.const import __version__ as HAVERSION  # noqa
+from awesomeversion import AwesomeVersion
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
@@ -29,6 +31,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+HA_VERSION = AwesomeVersion(HAVERSION)
 
 class DobissConnection:
     """setup connection to dobiss nxt server."""
@@ -122,7 +125,8 @@ class DobissOptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry):
         """Initialize options flow."""
-        self.config_entry = config_entry
+        if HA_VERSION < '2024.12':
+            self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
         """Handle options flow."""
