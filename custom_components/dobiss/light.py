@@ -136,9 +136,9 @@ class HADobissLight(LightEntity):
     @property
     def color_mode(self):
         """Flag supported features."""
-        supports = 0
+        supports = LightEntityFeature(0)
         if self._dobisslight.dimmable:
-            supports = LightEntityFeature.ColorMode.BRIGHTNESS
+            supports = LightEntityFeature.BRIGHTNESS
         return supports
 
     @property
@@ -146,7 +146,7 @@ class HADobissLight(LightEntity):
         """Flag supported features."""
         supports = 0
         if self._dobisslight.dimmable:
-            supports = LightEntityFeature.ColorMode.BRIGHTNESS
+            supports = LightEntityFeature.BRIGHTNESS
         return supports
 
 
