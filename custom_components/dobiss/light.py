@@ -157,6 +157,7 @@ class HADobissLight(LightEntity):
             supports = LightEntityFeature.BRIGHTNESS
         return supports
 
+
     @property
     def name(self):
         """Return the display name of this light."""
