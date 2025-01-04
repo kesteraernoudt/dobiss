@@ -7,6 +7,7 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     LightEntity,
     LightEntityFeature,
+    ColorMode, 
 )
 from homeassistant.const import ATTR_ENTITY_ID, ENTITY_MATCH_ALL, ENTITY_MATCH_NONE
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -53,6 +54,9 @@ class HADobissLight(LightEntity):
         """Init dobiss light device."""
         super().__init__()
         self._dobisslight = dobisslight
+        self._attr_supported_color_modes = {ColorMode.ONOFF}
+        if self._dobisslight.dimmable:
+            self._attr_supported_color_modes.add(ColorMode.BRIGHTNESS)
 
     @property
     def device_info(self):
@@ -135,16 +139,20 @@ class HADobissLight(LightEntity):
 
     @property
     def color_mode(self):
-        """Flag supported features."""
-        supports = LightEntityFeature(0)
+        """Return the color mode of the light."""
         if self._dobisslight.dimmable:
-            supports = LightEntityFeature.BRIGHTNESS
-        return supports
+            return ColorMode.BRIGHTNESS
+        return ColorMode.ONOFF
 
     @property
     def supported_color_modes(self):
+        """Return the supported color modes."""
+        return self._attr_supported_color_modes
+
+    @property
+    def supported_features(self):
         """Flag supported features."""
-        supports = 0
+        supports = LightEntityFeature(0)
         if self._dobisslight.dimmable:
             supports = LightEntityFeature.BRIGHTNESS
         return supports
