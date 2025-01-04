@@ -140,24 +140,14 @@ class HADobissLight(LightEntity):
     @property
     def color_mode(self):
         """Return the color mode of the light."""
-        mode = {ColorMode.ONOFF}
         if self._dobisslight.dimmable:
-            mode.add(ColorMode.BRIGHTNESS)
-        return mode
+            return ColorMode.BRIGHTNESS
+        return ColorMode.ONOFF
 
     @property
     def supported_color_modes(self):
         """Return the supported color modes."""
         return self._attr_supported_color_modes
-
-    @property
-    def supported_features(self):
-        """Flag supported features."""
-        supports = LightEntityFeature(0)
-        #if self._dobisslight.dimmable:
-        #    supports.add(ColorMode.BRIGHTNESS)
-        return supports
-
 
     @property
     def name(self):
