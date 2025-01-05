@@ -55,7 +55,7 @@ class HADobissLight(LightEntity):
         self._dobisslight = dobisslight
         self._attr_supported_color_modes = {ColorMode.ONOFF}
         if self._dobisslight.dimmable:
-            self._attr_supported_color_modes.add(ColorMode.BRIGHTNESS)
+            self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
 
     @property
     def device_info(self):
