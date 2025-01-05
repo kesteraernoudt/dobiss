@@ -185,13 +185,10 @@ class HADobiss:
         self.add_options()
         self.unsub = self.config_entry.add_update_listener(self.update_listener)
 
-        for component in PLATFORMS:
-            self.hass.async_create_task(
-                self.hass.config_entries.async_forward_entry_setup(
-                    self.config_entry, component
+        await self.hass.config_entries.async_forward_entry_setups(
+                    self.config_entry, PLATFORMS
                 )
-            )
-
+            
         @callback
         async def handle_action_request(call):
             """Handle action_request service."""
