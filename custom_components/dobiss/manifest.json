@@ -6,7 +6,7 @@
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/dobiss",
+  "documentation": "https://github.com/kesteraernoudt/dobiss/blob/dev/README.md",
   "homekit": {},
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/kesteraernoudt/dobiss/issues",
