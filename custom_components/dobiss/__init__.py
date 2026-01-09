@@ -33,7 +33,16 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["light", "switch", "sensor", "cover", "binary_sensor", "climate", "number"]
+PLATFORMS = [
+    "light",
+    "switch",
+    "sensor",
+    "cover",
+    "binary_sensor",
+    "climate",
+    "number",
+    "media_player",
+]
 
 SERVICE_ACTION_REQUEST = "action_request"
 SERVICE_STATUS_REQUEST = "status_request"
